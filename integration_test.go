@@ -69,7 +69,7 @@ func TestMainProgram_Integration(t *testing.T) {
 		},
 		{
 			name:        "Text with newline",
-			args:        []string{"Hello\\nWorld"},
+			args:        []string{"Hello\nWorld"},
 			expectError: false,
 			checkOutput: func(output string) bool {
 				// Should have 16 lines (8 per text line)
