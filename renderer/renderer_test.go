@@ -77,3 +77,115 @@ A8B8`
 	}
 
 }
+func TestSpaceBetweenCharacters(t *testing.T) {
+	input := "A A"
+	expected := `A1  A1
+A2  A2
+A3  A3
+A4  A4
+A5  A5
+A6  A6
+A7  A7
+A8  A8`
+	banner := map[rune][]string{
+		'A': {
+			"A1",
+			"A2",
+			"A3",
+			"A4",
+			"A5",
+			"A6",
+			"A7",
+			"A8",
+		},
+		' ': {
+			"  ",
+			"  ",
+			"  ",
+			"  ",
+			"  ",
+			"  ",
+			"  ",
+			"  ",
+		},
+	}
+	output := rendererASCII(input, banner)
+	if expected != output {
+		t.Error("Error")
+	}
+
+}
+func TestNumbersBetweenCharacters(t *testing.T) {
+	input := "A1A"
+	expected := `A11A1
+A21A2
+A31A3
+A41A4
+A51A5
+A61A6
+A71A7
+A81A8`
+	banner := map[rune][]string{
+		'A': {
+			"A1",
+			"A2",
+			"A3",
+			"A4",
+			"A5",
+			"A6",
+			"A7",
+			"A8",
+		},
+		'1': {
+			"1",
+			"1",
+			"1",
+			"1",
+			"1",
+			"1",
+			"1",
+			"1",
+		},
+	}
+	output := rendererASCII(input, banner)
+	if expected != output {
+		t.Error("Error")
+	}
+}
+func TestSpecialCharacters(t *testing.T) {
+	input := "{}"
+	expected := `{}
+{}
+{}
+{}
+{}
+{}
+{}
+{}`
+	banner := map[rune][]string{
+		'{': {
+			"{",
+			"{",
+			"{",
+			"{",
+			"{",
+			"{",
+			"{",
+			"{",
+		},
+		'}': {
+			"}",
+			"}",
+			"}",
+			"}",
+			"}",
+			"}",
+			"}",
+			"}",
+		},
+	}
+	output := rendererASCII(input, banner)
+	if expected != output {
+		t.Error("Error")
+	}
+}
