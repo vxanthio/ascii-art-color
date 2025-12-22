@@ -4,9 +4,19 @@ import (
 	"errors"
 	"fmt"
 	"os"
-	
+
 	"ascii-art/parser"
 	"ascii-art/renderer"
+)
+
+const (
+	// Exit codes for different error scenarios
+	exitCodeUsageError  = 1
+	exitCodeBannerError = 2
+	exitCodeRenderError = 3
+
+	// Default banner style
+	defaultBanner = "standard"
 )
 
 func main() {
@@ -14,30 +24,30 @@ func main() {
 	text, banner, err := ParseArgs(os.Args)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
-		os.Exit(1)
+		os.Exit(exitCodeUsageError)
 	}
-	
+
 	// Get banner file path
 	bannerPath, err := GetBannerPath(banner)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "Error:", err)
-		os.Exit(1)
+		os.Exit(exitCodeUsageError)
 	}
-	
+
 	// Load character map using parser
 	charMap, err := parser.BuildCharacterMap(bannerPath)
 	if err != nil {
-		fmt.Fprintln(os.Stderr, "Error loading banner file:", err)
-		os.Exit(2)
+		fmt.Fprintf(os.Stderr, "Error loading banner file: %v\n", err)
+		os.Exit(exitCodeBannerError)
 	}
-	
+
 	// Render the text using renderer
 	result, err := renderer.RenderText(text, charMap)
 	if err != nil {
-		fmt.Fprintln(os.Stderr, "Error rendering text:", err)
-		os.Exit(3)
+		fmt.Fprintf(os.Stderr, "Error rendering text: %v\n", err)
+		os.Exit(exitCodeRenderError)
 	}
-	
+
 	// Print result to stdout
 	fmt.Print(result)
 }
@@ -61,7 +71,7 @@ func ParseArgs(args []string) (text string, banner string, err error) {
 	if len(args) == 3 {
 		banner = args[2]
 	} else {
-		banner = "standard"
+		banner = defaultBanner
 	}
 	
 	return text, banner, nil
