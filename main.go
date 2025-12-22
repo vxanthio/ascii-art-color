@@ -56,24 +56,24 @@ func main() {
 func ParseArgs(args []string) (text string, banner string, err error) {
 	// args[0] is program name, so we need at least 2 elements
 	if len(args) < 2 {
-		return "", "", errors.New("Usage: go run . \"text\" [banner]")
+		return "", "", errors.New("usage: go run . \"text\" [banner]")
 	}
-	
+
 	// Too many arguments
 	if len(args) > 3 {
-		return "", "", errors.New("Error: too many arguments\nUsage: go run . \"text\" [banner]")
+		return "", "", errors.New("too many arguments\nusage: go run . \"text\" [banner]")
 	}
-	
+
 	// Get text (args[1])
 	text = args[1]
-	
+
 	// Get banner (args[2] if provided, otherwise default to "standard")
 	if len(args) == 3 {
 		banner = args[2]
 	} else {
 		banner = defaultBanner
 	}
-	
+
 	return text, banner, nil
 }
 
@@ -85,12 +85,12 @@ func GetBannerPath(banner string) (string, error) {
 		"shadow":     "testdata/shadow.txt",
 		"thinkertoy": "testdata/thinkertoy.txt",
 	}
-	
+
 	// Check if banner is valid
 	path, exists := bannerPaths[banner]
 	if !exists {
 		return "", fmt.Errorf("invalid banner name: %q\nValid options: standard, shadow, thinkertoy", banner)
 	}
-	
+
 	return path, nil
 }
