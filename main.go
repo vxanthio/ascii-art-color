@@ -1,9 +1,12 @@
+// Package main provides the ASCII art generator CLI application.
+// It converts text input into graphical ASCII art representations using banner files.
 package main
 
 import (
 	"errors"
 	"fmt"
 	"os"
+	"strings"
 
 	"ascii-art/parser"
 	"ascii-art/renderer"
@@ -64,8 +67,8 @@ func ParseArgs(args []string) (text string, banner string, err error) {
 		return "", "", errors.New("too many arguments\nusage: go run . \"text\" [banner]")
 	}
 
-	// Get text (args[1])
-	text = args[1]
+	// Get text (args[1]) and interpret escape sequences
+	text = strings.ReplaceAll(args[1], "\\n", "\n")
 
 	// Get banner (args[2] if provided, otherwise default to "standard")
 	if len(args) == 3 {
