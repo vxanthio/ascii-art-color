@@ -35,8 +35,8 @@ func TestMainProgram_Integration(t *testing.T) {
 			args:        []string{""},
 			expectError: false,
 			checkOutput: func(output string) bool {
-				// Should have 8 empty lines
-				return output == "\n\n\n\n\n\n\n\n"
+				// Should have no output (spec requirement)
+				return output == ""
 			},
 		},
 		{
