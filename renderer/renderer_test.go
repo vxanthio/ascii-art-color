@@ -189,3 +189,49 @@ func TestSpecialCharacters(t *testing.T) {
 		t.Error("Error")
 	}
 }
+func TestNewlineBetweenCharacters(t *testing.T) {
+	input := "A\nB"
+	expected := `A1
+A2
+A3
+A4
+A5
+A6
+A7
+A8
+B1
+B2
+B3
+B4
+B5
+B6
+B7
+B8`
+	banner := map[rune][]string{
+		'A': {
+			"A1",
+			"A2",
+			"A3",
+			"A4",
+			"A5",
+			"A6",
+			"A7",
+			"A8",
+		},
+		'B': {
+			"B1",
+			"B2",
+			"B3",
+			"B4",
+			"B5",
+			"B6",
+			"B7",
+			"B8",
+		},
+	}
+	output := rendererASCII(input, banner)
+	if expected != output {
+		t.Error("Error")
+	}
+
+}
