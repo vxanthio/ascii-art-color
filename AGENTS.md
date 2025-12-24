@@ -9,9 +9,7 @@ This is a Go CLI application that converts text to ASCII art using three banner 
 ## Setup Commands
 
 ```bash
-# Install Go dependencies (downloads standard library if needed)
-go mod download
-go mod verify
+# No external dependencies to install (Go standard library only)
 
 # Build the project
 make build
@@ -99,21 +97,32 @@ func TestFunctionName_Scenario(t *testing.T) {
 
 ```
 ascii-art/
-├── main.go                 # CLI entry point
-├── integration_test.go     # End-to-end tests
+├── .gitignore             # Git ignore rules
+├── .golangci.yml          # Linter configuration
+├── LICENSE                # MIT License
+├── Makefile               # Build automation (30+ targets)
+├── go.mod                 # Go module file (no external deps)
+├── main.go                # CLI entry point
+├── integration_test.go    # End-to-end tests
 ├── main_test.go           # Unit tests for main package
-├── parser/                # Banner file parsing
+├── parser/                # Banner file parsing package
 │   ├── parser.go
 │   ├── parser_test.go
 │   └── parser_bench_test.go
-├── renderer/              # ASCII art rendering
+├── renderer/              # ASCII art rendering package
 │   ├── renderer.go
 │   ├── renderer_test.go
 │   └── renderer_bench_test.go
-└── testdata/              # Banner files (DO NOT MODIFY)
-    ├── standard.txt
-    ├── shadow.txt
-    └── thinkertoy.txt
+├── testdata/              # Banner files (DO NOT MODIFY)
+│   ├── standard.txt
+│   ├── shadow.txt
+│   └── thinkertoy.txt
+└── Documentation/
+    ├── README.md          # User documentation
+    ├── AGENTS.md          # This file
+    ├── CHANGELOG.md       # Version history
+    ├── CONTRIBUTING.md    # Contribution guidelines
+    └── PERMISSIONS.md     # Team workflow
 ```
 
 ## Security Considerations
@@ -126,7 +135,7 @@ ascii-art/
 ### Input Validation
 - Validate all user input before processing
 - Support only ASCII characters 32-126 (printable characters)
-- Reject or handle unsupported characters gracefully
+- Return error for unsupported characters (do not silently skip)
 
 ### Error Handling
 - Never expose internal paths in error messages
@@ -141,13 +150,19 @@ Use Conventional Commits format:
 <type>(<scope>): <description>
 
 [optional body]
-
-🤖 Generated with [Claude Code](https://claude.com/claude-code)
-
-Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com>
 ```
 
-Types: `feat`, `fix`, `docs`, `test`, `refactor`, `perf`, `chore`, `build`
+**Types**: `feat`, `fix`, `docs`, `test`, `refactor`, `perf`, `chore`, `build`
+
+**Scopes**: `parser`, `renderer`, `main`, `docs`, `build`
+
+**Example**:
+```
+feat(parser): add validation for banner file format
+
+Added check to ensure banner file has exactly 855 lines before parsing.
+Prevents crash on malformed banner files.
+```
 
 ## Build and Release
 
