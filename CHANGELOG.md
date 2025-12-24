@@ -36,12 +36,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Testing targets (test, coverage, bench)
   - Cross-compilation for Linux, macOS, Windows
   - CI/CD targets (ci, pre-commit)
-  - Utility targets (deps, tidy, version, help)
+  - Utility targets (tidy, version, help, clean)
 - Comprehensive documentation
   - Professional README.md with usage examples
-  - PERFORMANCE.md with detailed benchmark analysis
-  - Architecture documentation
-  - Contributing guidelines
+  - AGENTS.md for AI coding agents
+  - CONTRIBUTING.md with development guidelines
+  - PERMISSIONS.md for team workflow
 - golangci-lint configuration
   - 20+ enabled linters
   - Comprehensive code quality checks
