@@ -1,4 +1,4 @@
-// Package renderer_test contains unit tests for the ASCII renderer.
+// Package renderer contains unit tests for the ASCII renderer.
 // These tests verify that RendererASCII correctly converts input strings
 // into their ASCII-art representations using a provided banner.
 package renderer
@@ -12,7 +12,11 @@ import (
 func TestEmptyInput(t *testing.T) {
 	input := ""
 	banner := map[rune][]string{}
-	output := RendererASCII(input, banner)
+	output, err := RendererASCII(input, banner)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+
+	}
 	if input != output {
 		t.Errorf("expected:\n%q\ngot:\n%q", input, output)
 
@@ -34,7 +38,10 @@ A8`
 	banner := map[rune][]string{
 		'A': {"A1", "A2", "A3", "A4", "A5", "A6", "A7", "A8"},
 	}
-	output := RendererASCII(input, banner)
+	output, err := RendererASCII(input, banner)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
 	if expected != output {
 		t.Errorf("expected:\n%q\ngot:\n%q", expected, output)
 
@@ -57,7 +64,10 @@ A8B8`
 		'A': {"A1", "A2", "A3", "A4", "A5", "A6", "A7", "A8"},
 		'B': {"B1", "B2", "B3", "B4", "B5", "B6", "B7", "B8"},
 	}
-	output := RendererASCII(input, banner)
+	output, err := RendererASCII(input, banner)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
 	if expected != output {
 		t.Errorf("expected:\n%q\ngot:\n%q", expected, output)
 
@@ -81,7 +91,10 @@ A8  A8`
 		'A': {"A1", "A2", "A3", "A4", "A5", "A6", "A7", "A8"},
 		' ': {"  ", "  ", "  ", "  ", "  ", "  ", "  ", "  "},
 	}
-	output := RendererASCII(input, banner)
+	output, err := RendererASCII(input, banner)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
 	if expected != output {
 		t.Errorf("expected:\n%q\ngot:\n%q", expected, output)
 
@@ -105,7 +118,10 @@ A81A8`
 		'A': {"A1", "A2", "A3", "A4", "A5", "A6", "A7", "A8"},
 		'1': {"1", "1", "1", "1", "1", "1", "1", "1"},
 	}
-	output := RendererASCII(input, banner)
+	output, err := RendererASCII(input, banner)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
 	if expected != output {
 		t.Errorf("expected:\n%q\ngot:\n%q", expected, output)
 
@@ -128,7 +144,10 @@ func TestSpecialCharacters(t *testing.T) {
 		'{': {"{", "{", "{", "{", "{", "{", "{", "{"},
 		'}': {"}", "}", "}", "}", "}", "}", "}", "}"},
 	}
-	output := RendererASCII(input, banner)
+	output, err := RendererASCII(input, banner)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
 	if expected != output {
 		t.Errorf("expected:\n%q\ngot:\n%q", expected, output)
 
@@ -159,7 +178,10 @@ B8`
 		'A': {"A1", "A2", "A3", "A4", "A5", "A6", "A7", "A8"},
 		'B': {"B1", "B2", "B3", "B4", "B5", "B6", "B7", "B8"},
 	}
-	output := RendererASCII(input, banner)
+	output, err := RendererASCII(input, banner)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
 	if expected != output {
 		t.Errorf("expected:\n%q\ngot:\n%q", expected, output)
 
@@ -182,7 +204,10 @@ A8`
 	banner := map[rune][]string{
 		'A': {"A1", "A2", "A3", "A4", "A5", "A6", "A7", "A8"},
 	}
-	output := RendererASCII(input, banner)
+	output, err := RendererASCII(input, banner)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
 	if expected != output {
 		t.Errorf("expected:\n%q\ngot:\n%q", expected, output)
 	}
@@ -214,8 +239,50 @@ B8`
 		'A': {"A1", "A2", "A3", "A4", "A5", "A6", "A7", "A8"},
 		'B': {"B1", "B2", "B3", "B4", "B5", "B6", "B7", "B8"},
 	}
-	output := RendererASCII(input, banner)
+	output, err := RendererASCII(input, banner)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
 	if expected != output {
 		t.Errorf("expected:\n%q\ngot:\n%q", expected, output)
+	}
+}
+func TestMissigCharaster(t *testing.T) {
+	input := "AB"
+	banner := map[rune][]string{
+		'A': {"A1", "A2", "A3", "A4", "A5", "A6", "A7", "A8"},
+	}
+	output, err := RendererASCII(input, banner)
+	if err == nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if output != "" {
+		t.Errorf("expected empty output on error, got %q", output)
+
+	}
+
+}
+func TestCorruptedBanner(t *testing.T) {
+	input := "A"
+	banner := map[rune][]string{
+		'A': {"A1", "A2", "A3", "A4", "A6", "A7", "A8"},
+	}
+	output, err := RendererASCII(input, banner)
+	if err == nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if output != "" {
+		t.Errorf("expected empty output on error, got %q", output)
+	}
+}
+func TestEmptyBanner(t *testing.T) {
+	input := "A"
+	banner := map[rune][]string{}
+	output, err := RendererASCII(input, banner)
+	if err == nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if output != "" {
+		t.Errorf("expected empty output on error, got %q", output)
 	}
 }
