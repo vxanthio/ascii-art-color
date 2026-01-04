@@ -263,7 +263,11 @@ func TestMissigCharaster(t *testing.T) {
 	}
 	output, err := renderer.RendererASCII(input, banner)
 	if err == nil {
-		t.Fatalf("unexpected error: %v", err)
+		t.Error("expected error for missing character 'B', got nil")
+	}
+	expectedMsg := "character B"
+	if !strings.Contains(err.Error(), expectedMsg) {
+		t.Errorf("error message should mention character B, got: %v", err)
 	}
 	if output != "" {
 		t.Errorf("expected empty output on error, got %q", output)
@@ -281,7 +285,7 @@ func TestCorruptedBanner(t *testing.T) {
 	}
 	output, err := renderer.RendererASCII(input, banner)
 	if err == nil {
-		t.Fatalf("unexpected error: %v", err)
+		t.Error("expected error for corrupted banner, got nil")
 	}
 	if output != "" {
 		t.Errorf("expected empty output on error, got %q", output)
