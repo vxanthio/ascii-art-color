@@ -1,6 +1,6 @@
 // Package parser provides functionality for loading and parsing ASCII art banner files.
 // Supports standard ASCII printable characters (32-126) from banner files in the format:
-// 8 lines per character + 1 separator line, 856 total lines for 95 characters.
+// 8 lines per character + 1 separator line, 855 total lines for 95 characters.
 package parser
 
 import (
@@ -36,29 +36,21 @@ func LoadBanner(path string) (Banner, error) {
 
 // readLines opens the file at the given path and returns all its lines as a slice of strings.
 func readLines(path string) ([]string, error) {
-	// Open the file for reading.
 	file, err := os.Open(path) // #nosec G304 -- trusted banner files
 	if err != nil {
 		return nil, err
 	}
+	defer file.Close() //nolint:errcheck // read-only file
 
-	defer func() {
-		if closeErr := file.Close(); closeErr != nil && err == nil {
-			err = closeErr
-		}
-	}()
-
-	// Create a scanner to read the file line by line.
 	scanner := bufio.NewScanner(file)
-
 	var lines []string
 	for scanner.Scan() {
 		lines = append(lines, scanner.Text())
 	}
-	if scanErr := scanner.Err(); scanErr != nil {
-		return lines, scanErr
+
+	if err := scanner.Err(); err != nil {
+		return lines, err
 	}
-	// Return all collected lines.
 	return lines, nil
 }
 
