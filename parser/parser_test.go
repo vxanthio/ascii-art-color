@@ -17,7 +17,7 @@ func TestLoadBannerSpaceChar(t *testing.T) {
 
 	spaceChar := ' '
 	expected := []string{
-		"",
+		"      ",
 		"      ",
 		"      ",
 		"      ",
@@ -61,13 +61,13 @@ func TestLoadBannerExclamationChar(t *testing.T) {
 	}
 	char := '!'
 	expected := []string{
-		"",
 		"   ",
 		"_| ",
 		"_| ",
 		"_| ",
 		"   ",
 		"_| ",
+		"   ",
 		"   ",
 	}
 	actual, ok := banner[char]
@@ -101,7 +101,7 @@ func TestLoadBannerStandardSpace(t *testing.T) {
 		t.Fatalf("expected 8 lines for space, got %d", len(actual))
 	}
 	expected := []string{
-		"",
+		"      ",
 		"      ",
 		"      ",
 		"      ",
@@ -135,13 +135,13 @@ func TestLoadBannerShadowA(t *testing.T) {
 	}
 
 	expected := []string{
-		"",
 		"         ",
 		"  _|_|   ",
 		"_|    _| ",
 		"_|_|_|_| ",
 		"_|    _| ",
 		"_|    _| ",
+		"         ",
 		"         ",
 	}
 
