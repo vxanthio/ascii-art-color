@@ -254,9 +254,9 @@ B8`
 	}
 }
 
-// TestMissigCharaster checks that rendering fails
+// TestMissigCharacter checks that rendering fails
 // when the input contains a character missing from the banner.
-func TestMissigCharaster(t *testing.T) {
+func TestMissigCharacter(t *testing.T) {
 	input := "AB"
 	banner := map[rune][]string{
 		'A': {"A1", "A2", "A3", "A4", "A5", "A6", "A7", "A8"},
