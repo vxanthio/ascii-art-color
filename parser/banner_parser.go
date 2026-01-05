@@ -65,7 +65,7 @@ func buildBanner(lines []string) (Banner, error) {
 
 	banner := make(Banner)
 	runeCode := firstPrintable
-	i := 0
+	i := 1
 
 	for i+linesPerGlyph <= len(lines) && runeCode <= lastPrintable {
 		block := lines[i : i+linesPerGlyph]
