@@ -9,27 +9,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - Parser package for reading and parsing ASCII art banner files
-  - `ReadBannerFile()` function to read banner files
-  - `ParseCharacters()` function to parse 95 ASCII characters (32-126)
-  - `BuildCharacterMap()` convenience function
+  - `LoadBanner()` function to read and parse banner files
+  - `readLines()` helper for file reading
+  - `buildBanner()` helper to construct Banner map
   - Comprehensive error handling with wrapped errors
   - Security annotations for file operations
 - Renderer package for converting text to ASCII art
-  - `RenderText()` main rendering function with newline support
-  - `renderLine()` for rendering single lines
-  - `validateInput()` for character validation
+  - `RendererASCII()` main rendering function with newline support
+  - `validateBannerCharacters()` for character validation
+  - `validateInput()` for input validation
   - Efficient string building with `strings.Builder`
   - Empty string optimization
 - Comprehensive test suite
   - 15 parser unit tests with 100% coverage
-  - 12 renderer unit tests with 100% coverage
-  - Integration tests for end-to-end functionality
+  - 14 renderer unit tests with 100% coverage
+  - Integration tests for end-to-end functionality (main and renderer)
   - Table-driven tests for multiple scenarios
-  - 79.8% overall test coverage
-- Benchmark suite with 16 benchmarks
-  - Parser benchmarks (5 tests)
-  - Renderer benchmarks (11 tests)
-  - Performance metrics documentation
 - Professional Makefile with 30+ targets
   - Quality control targets (fmt, vet, lint, check)
   - Development targets (run, build, install)
@@ -64,17 +59,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Performance
 - Sub-millisecond rendering for typical use cases
-  - Single word ("Hello"): ~83 µs (12,000 ops/sec)
-  - Sentence (42 chars): ~143 µs (7,000 ops/sec)
-  - Paragraph (139 chars): ~506 µs (2,000 ops/sec)
-- Parser optimizations
-  - ReadBannerFile: ~42 µs
-  - ParseCharacters: ~30 µs
-  - BuildCharacterMap: ~78 µs
-- Renderer optimizations
-  - Empty string: 78.8 ns
-  - Linear scaling with text length
-  - Efficient memory allocation
+- Parser optimized for fast banner loading
+- Renderer optimized with efficient string building
+- Linear scaling O(n) with text length
 
 ## [1.0.0] - YYYY-MM-DD
 
