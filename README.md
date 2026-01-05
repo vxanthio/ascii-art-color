@@ -107,17 +107,19 @@ ascii-art/
 ├── integration_test.go        # End-to-end tests
 ├── main_test.go               # Unit tests for main package
 ├── parser/                    # Banner file parsing package
-│   ├── parser.go
-│   ├── parser_test.go
-│   └── parser_bench_test.go
+│   ├── banner_parser.go
+│   └── parser_test.go
 ├── renderer/                  # ASCII art rendering package
 │   ├── renderer.go
 │   ├── renderer_test.go
-│   └── renderer_bench_test.go
-├── testdata/                  # Banner files (DO NOT MODIFY)
-│   ├── standard.txt
-│   ├── shadow.txt
-│   └── thinkertoy.txt
+│   └── renderer_integration_test.go
+├── testdata/                  # Banner files and test fixtures
+│   ├── standard.txt           # Standard banner
+│   ├── shadow.txt             # Shadow banner
+│   ├── thinkertoy.txt         # Thinkertoy banner
+│   ├── corrupted.txt          # Test fixture: corrupted file
+│   ├── empty.txt              # Test fixture: empty file
+│   └── oversized.txt          # Test fixture: oversized file
 └── Documentation/
     ├── README.md              # This file
     ├── AGENTS.md              # AI agent instructions
