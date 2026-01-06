@@ -136,9 +136,6 @@ make test
 
 # With coverage report
 make coverage
-
-# Run benchmarks
-make bench
 ```
 
 ### Build Commands
@@ -166,11 +163,9 @@ The project follows a clean architecture with three main packages:
 
 ## Performance
 
-- **Single word ("Hello")**: ~83 µs (12,000 ops/sec)
-- **Sentence (42 chars)**: ~143 µs (7,000 ops/sec)
-- **Parser**: 100% coverage
-- **Renderer**: 100% coverage
-- **Overall coverage**: 79.8%
+- **Parser**: 93.9% coverage
+- **Renderer**: 97.1% coverage
+- **Overall coverage**: 79.6%
 
 ## Contributing
 
@@ -181,6 +176,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for contribution guidelines.
 - [AGENTS.md](AGENTS.md) - AI agent instructions
 - [CHANGELOG.md](CHANGELOG.md) - Version history
 - [CONTRIBUTING.md](CONTRIBUTING.md) - Contribution guidelines
+- [PERMISSIONS.md](PERMISSIONS.md) - Team permissions
 
 ## License
 
