@@ -241,9 +241,6 @@ go test ./parser -v
 
 # Specific test
 go test -run TestParseBannerFile
-
-# With race detector (detects concurrent access bugs)
-go test -race ./...
 ```
 
 ## Commit Message Format
@@ -284,8 +281,6 @@ We use [Conventional Commits](https://www.conventionalcommits.org/) format:
 feat(parser): add support for UTF-8 characters
 
 Add UTF-8 character support while maintaining ASCII compatibility.
-
-Closes #42
 ```
 
 ```
@@ -299,6 +294,8 @@ docs(readme): update installation instructions
 
 Added instructions for installing via go install.
 ```
+
+**Note:** Footer lines like "Closes #42" are optional and only used when you have linked Jira issues or GitHub issues to track features/bugs. For this project, they're typically not needed unless explicitly using issue tracking.
 
 ## Pull Request Process
 
@@ -412,7 +409,7 @@ ascii-art/
 
 4. **Update documentation**
    - README.md
-   - CHANGELOG.md
+   - CHANGELOG.md (add entry under "Added" section)
    - Inline comments
 
 ### Fixing a Bug
