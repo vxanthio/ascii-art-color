@@ -27,9 +27,6 @@ make build
 make test
 # or: go test -v ./...
 
-# Run tests with race detection
-go test -race ./...
-
 # Generate coverage report
 make coverage
 # or: go test -coverprofile=coverage.out ./...
@@ -54,10 +51,9 @@ make coverage
 - Unexported functions: camelCase (renderLine, validateInput)
 - Test functions: TestFunctionName_Scenario
 
-### Modern Go Features
-- Use Go 1.22+ features: `range over int` instead of C-style loops
+### Best Practices
 - Use `strings.Builder` for efficient string concatenation
-- Prefer `os.ReadFile` over manual file handling
+- Use `bufio.Scanner` for line-by-line file reading
 
 ## Testing Standards
 
@@ -95,7 +91,7 @@ ascii-art/
 ├── .gitignore             # Git ignore rules
 ├── .golangci.yml          # Linter configuration
 ├── LICENSE                # MIT License
-├── Makefile               # Build automation (30+ targets)
+├── Makefile               # Build automation
 ├── go.mod                 # Go module file (no external deps)
 ├── main.go                # CLI entry point
 ├── integration_test.go    # End-to-end tests
@@ -175,12 +171,6 @@ make build-all      # All platforms (Linux, macOS, Windows)
 - Update CHANGELOG.md for all releases
 
 ## Performance Guidelines
-
-### Expected Performance
-- Single word ("Hello"): ~83 µs (12,000 ops/sec)
-- Sentence (42 chars): ~143 µs (7,000 ops/sec)
-- Parser: ~78 µs for full character map
-- Renderer: Linear scaling O(n) with text length
 
 ### Optimization Rules
 - DO use `strings.Builder` for string concatenation
