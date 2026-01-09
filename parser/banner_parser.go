@@ -54,6 +54,9 @@ func readLines(path string) ([]string, error) {
 	return lines, nil
 }
 
+// buildBanner constructs a Banner map from the raw lines read from a banner file.
+// It validates the format and creates a mapping from each printable ASCII character
+// (32-126) to its 8-line ASCII art representation.
 func buildBanner(lines []string) (Banner, error) {
 	if len(lines) == 0 {
 		return nil, fmt.Errorf("empty banner file")
