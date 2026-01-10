@@ -29,7 +29,7 @@ This project is part of the Zone01 curriculum. We expect all contributors to:
 
 - Go 1.22.2 or higher
 - make (optional but recommended)
-- golangci-lint (for code quality checks)
+- golangci-lint v2+ (for code quality checks)
 
 ### Installation
 
@@ -49,9 +49,14 @@ This project is part of the Zone01 curriculum. We expect all contributors to:
    make test
    ```
 
-4. **Install golangci-lint (optional but recommended)**
+4. **Install golangci-lint v2 (required for team compatibility)**
    ```bash
-   go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
+   go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@latest
+   ```
+
+   Verify installation:
+   ```bash
+   golangci-lint --version  # Should show v2.x.x
    ```
 
 ## Development Workflow
