@@ -10,7 +10,7 @@ import (
 // TestLoadBannerSpaceChar verifies that the space character loads correctly
 // from the shadow banner file.
 func TestLoadBannerSpaceChar(t *testing.T) {
-	banner, err := LoadBanner("../testdata/shadow.txt")
+	banner, err := LoadBanner("../../cmd/ascii-art/testdata/shadow.txt")
 	if err != nil {
 		t.Fatalf("LoadBanner failed: %v", err)
 	}
@@ -46,7 +46,7 @@ func TestLoadBannerSpaceChar(t *testing.T) {
 // TestLoadBannerMissingFile verifies that LoadBanner returns an error
 // when the specified banner file does not exist.
 func TestLoadBannerMissingFile(t *testing.T) {
-	_, err := LoadBanner("../testdata/nope.txt")
+	_, err := LoadBanner("../../cmd/ascii-art/testdata/nope.txt")
 	if err == nil {
 		t.Errorf("expected error for missing file, got nil")
 	}
@@ -55,7 +55,7 @@ func TestLoadBannerMissingFile(t *testing.T) {
 // TestLoadBannerExclamationChar verifies that the exclamation mark
 // loads correctly from the shadow banner file.
 func TestLoadBannerExclamationChar(t *testing.T) {
-	banner, err := LoadBanner("../testdata/shadow.txt")
+	banner, err := LoadBanner("../../cmd/ascii-art/testdata/shadow.txt")
 	if err != nil {
 		t.Fatalf("LoadBanner Failed: %v", err)
 	}
@@ -87,7 +87,7 @@ func TestLoadBannerExclamationChar(t *testing.T) {
 // TestLoadBannerStandardSpace verifies that the space character loads
 // correctly from the standard banner file.
 func TestLoadBannerStandardSpace(t *testing.T) {
-	banner, err := LoadBanner("../testdata/standard.txt")
+	banner, err := LoadBanner("../../cmd/ascii-art/testdata/standard.txt")
 	if err != nil {
 		t.Fatalf("loadBanner failed: %v", err)
 	}
@@ -120,7 +120,7 @@ func TestLoadBannerStandardSpace(t *testing.T) {
 // TestLoadBannerShadowA verifies that the letter 'A' loads correctly
 // from the shadow banner file.
 func TestLoadBannerShadowA(t *testing.T) {
-	banner, err := LoadBanner("../testdata/shadow.txt")
+	banner, err := LoadBanner("../../cmd/ascii-art/testdata/shadow.txt")
 	if err != nil {
 		t.Fatalf("LoadBanner failed: %v", err)
 	}
@@ -155,7 +155,7 @@ func TestLoadBannerShadowA(t *testing.T) {
 // TestLoadBannerEmptyFile verifies that LoadBanner returns an error
 // when given an empty banner file (0 lines).
 func TestLoadBannerEmptyFile(t *testing.T) {
-	_, err := LoadBanner("../testdata/empty.txt")
+	_, err := LoadBanner("../../cmd/ascii-art/testdata/empty.txt")
 	if err == nil {
 		t.Error("expected error for empty file, got nil")
 	}
@@ -164,7 +164,7 @@ func TestLoadBannerEmptyFile(t *testing.T) {
 // TestLoadBannerCorruptedFile verifies that LoadBanner returns an error
 // when given a corrupted banner file with too few lines.
 func TestLoadBannerCorruptedFile(t *testing.T) {
-	_, err := LoadBanner("../testdata/corrupted.txt")
+	_, err := LoadBanner("../../cmd/ascii-art/testdata/corrupted.txt")
 	if err == nil {
 		t.Error("expected error for corrupted file, got nil")
 	}
@@ -173,7 +173,7 @@ func TestLoadBannerCorruptedFile(t *testing.T) {
 // TestLoadBannerOversizedFile verifies that LoadBanner returns an error
 // when given an oversized banner file with too many lines.
 func TestLoadBannerOversizedFile(t *testing.T) {
-	_, err := LoadBanner("../testdata/oversized.txt")
+	_, err := LoadBanner("../../cmd/ascii-art/testdata/oversized.txt")
 	if err == nil {
 		t.Error("expected error for oversized file, got nil")
 	}
@@ -182,7 +182,7 @@ func TestLoadBannerOversizedFile(t *testing.T) {
 // TestLoadBannerThinkertoy verifies that the thinkertoy banner file
 // loads correctly with all 95 ASCII characters (32-126).
 func TestLoadBannerThinkertoy(t *testing.T) {
-	banner, err := LoadBanner("../testdata/thinkertoy.txt")
+	banner, err := LoadBanner("../../cmd/ascii-art/testdata/thinkertoy.txt")
 	if err != nil {
 		t.Fatalf("thinkertoy failed: %v", err)
 	}
@@ -194,7 +194,7 @@ func TestLoadBannerThinkertoy(t *testing.T) {
 // TestLoadBannerNumbers verifies that all digits 0-9 load correctly
 // from the standard banner file with exactly 8 lines each.
 func TestLoadBannerNumbers(t *testing.T) {
-	banner, err := LoadBanner("../testdata/standard.txt")
+	banner, err := LoadBanner("../../cmd/ascii-art/testdata/standard.txt")
 	if err != nil {
 		t.Fatalf("LoadBanner failed: %v", err)
 	}
@@ -215,7 +215,7 @@ func TestLoadBannerNumbers(t *testing.T) {
 // TestLoadBannerCompleteCharacterSet verifies that all 95 printable
 // ASCII characters (32-126) load correctly with exactly 8 lines each.
 func TestLoadBannerCompleteCharacterSet(t *testing.T) {
-	banner, err := LoadBanner("../testdata/standard.txt")
+	banner, err := LoadBanner("../../cmd/ascii-art/testdata/standard.txt")
 	if err != nil {
 		t.Fatalf("LoadBanner failed: %v", err)
 	}
@@ -240,7 +240,7 @@ func TestLoadBannerCompleteCharacterSet(t *testing.T) {
 // TestLoadBannerAllSpecialCharacters verifies that all special characters
 // (punctuation, symbols, etc.) load correctly from the banner file.
 func TestLoadBannerAllSpecialCharacters(t *testing.T) {
-	banner, err := LoadBanner("../testdata/standard.txt")
+	banner, err := LoadBanner("../../cmd/ascii-art/testdata/standard.txt")
 	if err != nil {
 		t.Fatalf("LoadBanner failed: %v", err)
 	}

@@ -7,7 +7,7 @@ import (
 	"strings"
 	"testing"
 
-	"ascii-art/renderer"
+	"ascii-art-color/internal/renderer"
 )
 
 // TestEmptyInput verifies that an empty input string
