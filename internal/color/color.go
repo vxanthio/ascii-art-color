@@ -2,6 +2,7 @@ package color
 
 import (
 	"fmt"
+	"strconv"
 	"strings"
 )
 
@@ -24,8 +25,34 @@ var namedColors = map[string]RGB{
 // Parse converts a color specification string into RGB.
 func Parse(spec string) (RGB, error) {
 	lower := strings.ToLower(spec)
+
 	if color, ok := namedColors[lower]; ok {
 		return color, nil
 	}
-	return RGB{}, fmt.Errorf("unknown color nameL %q", spec)
+	if len(spec) == 7 && spec[0] == '#' {
+		return parseHex(spec)
+	}
+	return RGB{}, fmt.Errorf("unknown color format %q", spec)
+}
+
+func parseHex(hex string) (RGB, error) {
+	if len(hex) != 7 || hex[0] != '#' {
+		return RGB{}, fmt.Errorf("invalid hex format: %q", hex)
+	}
+
+	r, err := strconv.ParseUint(hex[1:3], 16, 8)
+	if err != nil {
+		return RGB{}, fmt.Errorf("invalid red hex: %v", err)
+	}
+
+	g, err := strconv.ParseUint(hex[3:5], 16, 8)
+	if err != nil {
+		return RGB{}, fmt.Errorf("invalid green hex: %v", err)
+	}
+	b, err := strconv.ParseUint(hex[5:7], 16, 8)
+	if err != nil {
+		return RGB{}, fmt.Errorf("invalid blue hex: %v", err)
+	}
+
+	return RGB{uint8(r), uint8(g), uint8(b)}, nil
 }
