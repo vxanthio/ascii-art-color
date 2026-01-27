@@ -46,3 +46,28 @@ func TestParseArgs_FormatColor(t *testing.T) {
 		t.Errorf("exprected error invalid color format")
 	}
 }
+func TestParseArgs_SingleStringAllowed(t *testing.T) {
+	args := []string{
+		"program",
+		"text",
+	}
+	err := flagparser.ParseArgs(args)
+	if err != nil {
+		t.Errorf("unexpected error: %v", err)
+	}
+}
+func TestParseArgs_FlagAndStringAllowed(t *testing.T) {
+	args := []string{"program", "--color=red", "text"}
+	err := flagparser.ParseArgs(args)
+	if err != nil {
+		t.Errorf("unexpected error:%v", err)
+	}
+}
+
+func TestParseArgs_TestParseArgs_ColorSubstringAllowed(t *testing.T) {
+	args := []string{"program", "--color=red", "text", "substring"}
+	err := flagparser.ParseArgs(args)
+	if err != nil {
+		t.Errorf("unexpected error:%v", err)
+	}
+}
