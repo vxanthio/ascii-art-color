@@ -64,10 +64,17 @@ func TestParseArgs_FlagAndStringAllowed(t *testing.T) {
 	}
 }
 
-func TestParseArgs_TestParseArgs_ColorSubstringAllowed(t *testing.T) {
+func TestParseArgs_ColorSubstringAllowed(t *testing.T) {
 	args := []string{"program", "--color=red", "text", "substring"}
 	err := flagparser.ParseArgs(args)
 	if err != nil {
 		t.Errorf("unexpected error:%v", err)
+	}
+}
+func TestParseArgs_MissingString(t *testing.T) {
+	args := []string{"program", "--color=red"}
+	err := flagparser.ParseArgs(args)
+	if err == nil {
+		t.Errorf("Usage: go run . [OPTION] [STRING]")
 	}
 }
