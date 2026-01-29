@@ -19,6 +19,10 @@ func ParseArgs(args []string) error {
 	if strings.HasPrefix(args[1], "--color=") && len(args) < 3 {
 		return errors.New("error")
 	}
+	checkColorInTheFlag := strings.Split(args[1], "=")
+	if len(checkColorInTheFlag) > 1 && checkColorInTheFlag[1] == "" {
+		return errors.New("error")
+	}
 
 	return nil
 
