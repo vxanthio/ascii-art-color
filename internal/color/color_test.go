@@ -27,6 +27,11 @@ func TestParseNamedColors(t *testing.T) {
 		{"case insensitive", "RED", RGB{255, 0, 0}, false},
 		{"unknown color", "blurple", RGB{}, true},
 		{"hex red", "#ff0000", RGB{255, 0, 0}, false},
+		{"orange", "orange", RGB{255, 165, 0}, false},
+		{"purple", "purple", RGB{128, 0, 128}, false},
+		{"pink", "pink", RGB{255, 192, 203}, false},
+		{"brown", "brown", RGB{165, 42, 42}, false},
+		{"gray", "gray", RGB{128, 128, 128}, false},
 	}
 
 	for _, tt := range tests {

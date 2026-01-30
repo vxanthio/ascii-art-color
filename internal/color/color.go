@@ -20,6 +20,11 @@ var namedColors = map[string]RGB{
 	"magenta": {255, 0, 255},
 	"cyan":    {0, 255, 255},
 	"white":   {255, 255, 255},
+	"orange":  {255, 165, 0},
+	"purple":  {128, 0, 128},   // #800080
+	"pink":    {255, 192, 203}, // #FFC0CB
+	"brown":   {165, 42, 42},   // #A52A2A
+	"gray":    {128, 128, 128}, // #808080
 }
 
 // Parse converts a color specification string into RGB.
