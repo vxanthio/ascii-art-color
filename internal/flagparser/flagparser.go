@@ -52,16 +52,16 @@ func ParseArgs(args []string) error {
 }
 func validateColorFlag(args []string) error {
 	isItAFlag := strings.HasPrefix(args[1], "-")
-	if isItAFlag == true {
+	if isItAFlag {
 
 		firstTwoLetters := strings.HasPrefix(args[1], "--")
 
-		if firstTwoLetters == false {
+		if !firstTwoLetters {
 			return errors.New("error")
 		}
 
-		equalExistance := strings.Contains(args[1], "=")
-		if equalExistance == false {
+		hasEqual := strings.Contains(args[1], "=")
+		if !hasEqual {
 			return errors.New("error")
 		}
 
