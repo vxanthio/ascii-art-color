@@ -92,3 +92,10 @@ func TestParseArgs_InvalidPositionForColorFlag(t *testing.T) {
 		t.Errorf("expected error")
 	}
 }
+func TestParseArgs_SubstringMissingWhileStringExists(t *testing.T) {
+	args := []string{"program", "--color=red", "text"}
+	err := flagparser.ParseArgs(args)
+	if err != nil {
+		t.Errorf("unexpected error")
+	}
+}
