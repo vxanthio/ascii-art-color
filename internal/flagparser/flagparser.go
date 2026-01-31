@@ -2,6 +2,7 @@ package flagparser
 
 import (
 	"errors"
+	"strconv"
 	"strings"
 )
 
@@ -79,7 +80,23 @@ func validColors(color string) error {
 	}
 	_, exists := allowedColors[color]
 	if !exists {
-		return errors.New("error")
+		if strings.HasPrefix(color, "rgb(") {
+			inner := strings.TrimSuffix(strings.TrimPrefix(color, "rgb("), ")")
+			separatedText := strings.Split(inner, ",")
+			if len(separatedText) != 3 {
+				return errors.New("error")
+			}
+			for i := 0; i < len(separatedText); i++ {
+				digits, err := strconv.Atoi(separatedText[i])
+				if err != nil {
+					return err
+				}
+				if digits < 0 || digits > 255 {
+
+					return errors.New("error")
+				}
+			}
+		}
 	}
 
 	return nil
