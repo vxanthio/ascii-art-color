@@ -28,19 +28,23 @@ var namedColors = map[string]RGB{
 }
 
 // Parse converts a color specification string into RGB.
-func Parse(spec string) (RGB, error) {
-	lower := strings.ToLower(spec)
+func Parse(colorSpec string) (RGB, error) {
+	colorSpec = strings.TrimSpace(colorSpec)
+	if colorSpec == "" {
+		return RGB{}, fmt.Errorf("empty color specification")
+	}
+	lower := strings.ToLower(colorSpec)
 
 	if color, ok := namedColors[lower]; ok {
 		return color, nil
 	}
-	if len(spec) == 7 && spec[0] == '#' {
-		return parseHex(spec)
+	if len(colorSpec) == 7 && colorSpec[0] == '#' {
+		return parseHex(colorSpec)
 	}
 	if strings.HasPrefix(lower, "rgb(") {
-		return parseRGB(spec)
+		return parseRGB(colorSpec)
 	}
-	return RGB{}, fmt.Errorf("unknown color format %q", spec)
+	return RGB{}, fmt.Errorf("unknown color format %q", colorSpec)
 }
 
 func parseHex(hex string) (RGB, error) {
@@ -69,27 +73,33 @@ func parseRGB(rgbStr string) (RGB, error) {
 	content := strings.TrimPrefix(rgbStr, "rgb(")
 	content = strings.TrimSuffix(content, ")")
 
+	content = strings.TrimSpace(content)
+	if content == "" {
+		return RGB{}, fmt.Errorf("rgb() components cannot be empty")
+	}
+
 	parts := strings.Split(content, ",")
 	if len(parts) != 3 {
 		return RGB{}, fmt.Errorf("rgb() requires exactly 3 components, got %d", len(parts))
 	}
+
 	var r, g, b uint8
 	for i, part := range parts {
-		valStr := strings.TrimSpace(part)
-		val, err := strconv.ParseUint(valStr, 10, 8)
+		valueString := strings.TrimSpace(part)
+		value, err := strconv.ParseUint(valueString, 10, 8)
 		if err != nil {
-			return RGB{}, fmt.Errorf("invalid rgb() component %q: %v", valStr, err)
+			return RGB{}, fmt.Errorf("invalid rgb() component %q: %v", valueString, err)
 		}
-		if val > 255 {
-			return RGB{}, fmt.Errorf("rgb() component %q out of range (0-255)", valStr)
+		if value > 255 {
+			return RGB{}, fmt.Errorf("rgb() component %q out of range (0-255)", valueString)
 		}
 		switch i {
 		case 0:
-			r = uint8(val)
+			r = uint8(value)
 		case 1:
-			g = uint8(val)
+			g = uint8(value)
 		case 2:
-			b = uint8(val)
+			b = uint8(value)
 		}
 	}
 
@@ -98,12 +108,4 @@ func parseRGB(rgbStr string) (RGB, error) {
 
 func ANSI(rgb RGB) string {
 	return fmt.Sprintf("\033[38;2;%d;%d;%dm", rgb.R, rgb.G, rgb.B)
-}
-
-func Wrap(text, spec string) (string, error) {
-	rgb, err := Parse(spec)
-	if err != nil {
-		return "", err
-	}
-	return ANSI(rgb) + text + "\033[0m", nil
 }
