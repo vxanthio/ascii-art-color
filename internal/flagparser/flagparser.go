@@ -25,52 +25,55 @@ const (
 
 // errUsage is the single user-facing error returned for any invalid CLI input.
 // This keeps command-line output consistent and predictable.
-var errUsage = errors.New("Usage: go run . [OPTION] [STRING]")
+//
+//nolint:staticcheck // ST1005: capitalized per project specification
+var errUsage = errors.New("Usage: go run . [OPTION] [STRING]\n\nEX: go run . --color=<color> <substring to be colored> \"something\"")
 
 // ParseArgs validates the provided command-line arguments.
+//
+// The function checks argument count boundaries, flag syntax, flag position,
+// and ensures the --color flag (if present) contains a non-empty value.
+//
+// Parameters:
+//   - args: The command-line arguments including the program name (os.Args).
+//
+// Returns:
+//   - An error if the arguments are invalid, nil otherwise.
 func ParseArgs(args []string) error {
 	colorFlagCount := 0
 
-	// Validate argument count boundaries.
 	if len(args) < minimumArgs || len(args) > maximumArgs {
 		return errUsage
 	}
 
-	// Any flag-like argument must be the --color flag.
 	if strings.HasPrefix(args[1], "-") && !strings.HasPrefix(args[1], "--color=") {
 		return errUsage
 	}
 
-	// Scan arguments to detect the --color flag and enforce its position.
 	for i := 1; i < len(args); i++ {
 		if strings.HasPrefix(args[i], "--color=") {
 			colorFlagCount++
 
-			// Only one --color flag is allowed.
 			if colorFlagCount > 1 {
 				return errUsage
 			}
 
-			// The --color flag must appear as the second argument.
 			if i != 1 {
 				return errUsage
 			}
 		}
 	}
 
-	// If --color is provided, a string to color must follow.
 	if strings.HasPrefix(args[1], "--color=") && len(args) < 3 {
 		return errUsage
 	}
 
-	// Only validate that the color value is non-empty.
 	if strings.HasPrefix(args[1], "--color=") {
 		_, color, found := strings.Cut(args[1], "=")
 		if !found || color == "" {
 			return errUsage
 		}
-
 	}
-	return nil
 
+	return nil
 }
