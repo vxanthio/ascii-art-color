@@ -5,8 +5,9 @@
 package flagparser_test
 
 import (
-	"ascii-art-color/internal/flagparser"
 	"testing"
+
+	"ascii-art-color/internal/flagparser"
 )
 
 func TestParseArgs(t *testing.T) {
