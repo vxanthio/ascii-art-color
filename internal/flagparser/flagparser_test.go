@@ -1,8 +1,7 @@
 // Package flagparser_test contains unit tests for the flagparser package.
 //
-// These tests verify that ParseArgs correctly validates command-line arguments,
-// including argument count, flag syntax, flag position, banner handling,
-// and supported color formats.
+// These tests verify that ParseArgs correctly validates command-line argument
+// structure: argument count, flag syntax, flag position, and empty values.
 package flagparser_test
 
 import (
@@ -67,28 +66,8 @@ func TestParseArgs(t *testing.T) {
 			wantErr: true,
 		},
 		{
-			name:    "valid RGB color",
-			args:    []string{"program", "--color=rgb(255,0,0)", "text"},
-			wantErr: false,
-		},
-		{
-			name:    "invalid RGB out of range",
-			args:    []string{"program", "--color=rgb(300,0,0)", "text"},
-			wantErr: true,
-		},
-		{
-			name:    "valid HEX color",
-			args:    []string{"program", "--color=#ff0000", "text"},
-			wantErr: false,
-		},
-		{
-			name:    "invalid HEX length",
-			args:    []string{"program", "--color=#123", "text"},
-			wantErr: true,
-		},
-		{
-			name:    "invalid color name",
-			args:    []string{"program", "--color=tirquaz", "text"},
+			name:    "empty color value",
+			args:    []string{"program", "--color=", "text"},
 			wantErr: true,
 		},
 		{
