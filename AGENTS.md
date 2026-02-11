@@ -1,10 +1,10 @@
 # AGENTS.md
 
-Instructions for AI coding agents working on the ascii-art project.
+Instructions for AI coding agents working on the ascii-art-color project.
 
 ## Project Overview
 
-This is a Go CLI application that converts text to ASCII art using three banner styles (standard, shadow, thinkertoy). The project uses only Go standard library with zero external dependencies.
+This is a Go CLI application that converts text to ASCII art using three banner styles (standard, shadow, thinkertoy), with optional ANSI 24-bit color support for full text or specific substrings. The project uses only Go standard library with zero external dependencies.
 
 ## Setup Commands
 
@@ -13,11 +13,14 @@ This is a Go CLI application that converts text to ASCII art using three banner 
 
 # Build the project
 make build
-# or: go build -o ascii-art .
+# or: go build -o ascii-art ./cmd/ascii-art
 
-# Run the application
-./ascii-art "Hello" standard
-# or: go run . "Hello" standard
+# Run the application (normal mode)
+cd cmd/ascii-art && go run . "Hello" standard
+
+# Run the application (color mode)
+cd cmd/ascii-art && go run . --color=red "Hello"
+cd cmd/ascii-art && go run . --color=red He "Hello"
 ```
 
 ## Testing Commands
@@ -41,12 +44,13 @@ make coverage
 
 ### Code Organization
 - **Package documentation**: Every package must have a doc comment
+- **Function documentation**: Exported functions must have Parameters/Returns sections
 - **Constants over magic numbers**: Define const for all numeric literals
 - **Error wrapping**: Use `fmt.Errorf` with `%w` for error chains
 - **Error messages**: Lowercase, no ending punctuation (Go style guide ST1005)
 
 ### Naming Conventions
-- Package names: lowercase, single word (parser, renderer)
+- Package names: lowercase, single word (parser, renderer, color, coloring, flagparser)
 - Exported functions: PascalCase (RenderText, BuildCharacterMap)
 - Unexported functions: camelCase (renderLine, validateInput)
 - Test functions: TestFunctionName_Scenario
@@ -84,34 +88,45 @@ func TestFunctionName_Scenario(t *testing.T) {
 ## Project Structure
 
 ```
-ascii-art/
-├── .gitignore             # Git ignore rules
-├── .golangci.yml          # Linter configuration
-├── LICENSE                # MIT License
-├── Makefile               # Build automation
-├── go.mod                 # Go module file (no external deps)
-├── main.go                # CLI entry point
-├── integration_test.go    # End-to-end tests
-├── main_test.go           # Unit tests for main package
-├── parser/                # Banner file parsing package
-│   ├── banner_parser.go
-│   └── parser_test.go
-├── renderer/              # ASCII art rendering package
-│   ├── renderer.go
-│   └── renderer_test.go
-├── testdata/              # Banner files and test fixtures
-│   ├── standard.txt
-│   ├── shadow.txt
-│   ├── thinkertoy.txt
-│   ├── corrupted.txt      # Test fixture
-│   ├── empty.txt          # Test fixture
-│   └── oversized.txt      # Test fixture
-└── Documentation/
-    ├── README.md          # User documentation
-    ├── AGENTS.md          # This file
-    ├── CHANGELOG.md       # Version history
-    ├── CONTRIBUTING.md    # Contribution guidelines
-    └── PERMISSIONS.md     # Team workflow
+ascii-art-color/
+├── .gitignore                 # Git ignore rules
+├── .golangci.yml              # Linter configuration
+├── LICENSE                    # Project license
+├── Makefile                   # Build automation
+├── go.mod                     # Go module file (no external deps)
+├── AGENTS.md                  # This file
+├── CHANGELOG.md               # Version history
+├── CONTRIBUTING.md            # Contribution guidelines
+├── PERMISSIONS.md             # Team permissions
+├── README.md                  # User documentation
+├── cmd/
+│   └── ascii-art/
+│       ├── main.go            # CLI entry point
+│       ├── main_test.go       # Unit tests for main package
+│       ├── integration_test.go # End-to-end tests
+│       └── testdata/          # Banner files and test fixtures
+│           ├── standard.txt
+│           ├── shadow.txt
+│           ├── thinkertoy.txt
+│           ├── corrupted.txt  # Test fixture
+│           ├── empty.txt      # Test fixture
+│           └── oversized.txt  # Test fixture
+└── internal/
+    ├── color/                 # Color specification parsing
+    │   ├── color.go
+    │   └── color_test.go
+    ├── coloring/              # ANSI color application to ASCII art
+    │   ├── coloring.go
+    │   └── coloring_test.go
+    ├── flagparser/            # CLI argument validation
+    │   ├── flagparser.go
+    │   └── flagparser_test.go
+    ├── parser/                # Banner file parsing
+    │   ├── banner_parser.go
+    │   └── parser_test.go
+    └── renderer/              # ASCII art rendering
+        ├── renderer.go
+        └── renderer_test.go
 ```
 
 ## Security Considerations
@@ -129,7 +144,7 @@ ascii-art/
 ### Error Handling
 - Never expose internal paths in error messages
 - Wrap errors with context using `fmt.Errorf`
-- Use proper exit codes: 0 (success), 1 (usage), 2 (banner error), 3 (render error)
+- Use proper exit codes: 0 (success), 1 (usage), 2 (banner error), 3 (render error), 4 (color error)
 
 ## Commit Message Format
 
@@ -143,7 +158,7 @@ Use Conventional Commits format:
 
 **Types**: `feat`, `fix`, `docs`, `test`, `refactor`, `perf`, `chore`, `build`
 
-**Scopes**: `parser`, `renderer`, `main`, `docs`, `build`
+**Scopes**: `parser`, `renderer`, `main`, `color`, `coloring`, `flagparser`, `docs`, `build`, `tests`
 
 **Example**:
 ```
@@ -176,9 +191,9 @@ make build-all      # All platforms (Linux, macOS, Windows)
 ## Common Tasks
 
 ### Adding a New Banner Style
-1. Add banner file to `testdata/<name>.txt`
-2. Update `GetBannerPath()` in `main.go` to recognize new name
-3. Add integration test in `integration_test.go`
+1. Add banner file to `cmd/ascii-art/testdata/<name>.txt`
+2. Update `GetBannerPath()` in `cmd/ascii-art/main.go` to recognize new name
+3. Add integration test in `cmd/ascii-art/integration_test.go`
 4. Update README.md with new banner style
 5. Update CHANGELOG.md
 
@@ -199,12 +214,12 @@ make build-all      # All platforms (Linux, macOS, Windows)
 
 ## DO NOT
 
-- ❌ Add external dependencies (use only Go standard library)
-- ❌ Modify banner files in `testdata/`
-- ❌ Skip tests or reduce coverage
-- ❌ Commit without running `make check`
-- ❌ Use deprecated Go features
-- ❌ Add TODOs or FIXMEs without GitHub issues
+- Add external dependencies (use only Go standard library)
+- Modify banner files in `testdata/`
+- Skip tests or reduce coverage
+- Commit without running `make check`
+- Use deprecated Go features
+- Add TODOs or FIXMEs without GitHub issues
 
 ## Quality Checklist
 
