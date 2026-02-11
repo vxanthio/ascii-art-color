@@ -72,6 +72,62 @@ func hasColorFlag(args []string) bool {
 	return false
 }
 
+// isValidBanner checks whether a string is a recognized banner name.
+func isValidBanner(name string) bool {
+	return name == "standard" || name == "shadow" || name == "thinkertoy"
+}
+
+// extractColorArgs extracts color spec, substring, text, and banner from color-mode arguments.
+//
+// The function expects args[1] to be the --color=<value> flag. The remaining arguments
+// are interpreted as follows:
+//   - 3 args: prog --color=X text (no substring, default banner)
+//   - 4 args: prog --color=X text banner (if last arg is valid banner name)
+//   - 4 args: prog --color=X substring text (otherwise, default banner)
+//   - 5 args: prog --color=X substring text banner
+//
+// Parameters:
+//   - args: Command-line arguments including program name.
+//
+// Returns:
+//   - colorSpec: The color value from the --color= flag.
+//   - substring: The substring to color (empty if not provided).
+//   - text: The text to render (with escape sequences interpreted).
+//   - banner: The banner name to use.
+//   - err: An error if extraction fails.
+func extractColorArgs(args []string) (colorSpec, substring, text, banner string, err error) {
+	_, colorSpec, _ = strings.Cut(args[1], "=")
+
+	remaining := args[2:]
+
+	switch len(remaining) {
+	case 0:
+		return "", "", "", "", errors.New("missing text argument")
+	case 1:
+		text = remaining[0]
+		banner = defaultBanner
+	case 2:
+		if isValidBanner(remaining[1]) {
+			text = remaining[0]
+			banner = remaining[1]
+		} else {
+			substring = remaining[0]
+			text = remaining[1]
+			banner = defaultBanner
+		}
+	case 3:
+		substring = remaining[0]
+		text = remaining[1]
+		banner = remaining[2]
+	default:
+		return "", "", "", "", errors.New("too many arguments")
+	}
+
+	text = strings.ReplaceAll(text, "\\n", "\n")
+
+	return colorSpec, substring, text, banner, nil
+}
+
 // ParseArgs parses command-line arguments and extracts text and banner name.
 //
 // The function validates argument count, extracts the text argument, interprets
