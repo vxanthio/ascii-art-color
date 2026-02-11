@@ -19,6 +19,9 @@ import (
 	"os"
 	"strings"
 
+	"ascii-art-color/internal/color"
+	"ascii-art-color/internal/coloring"
+	"ascii-art-color/internal/flagparser"
 	"ascii-art-color/internal/parser"
 	"ascii-art-color/internal/renderer"
 )
@@ -35,6 +38,11 @@ const (
 )
 
 func main() {
+	if hasColorFlag(os.Args) {
+		runColorMode(os.Args)
+		return
+	}
+
 	text, banner, err := ParseArgs(os.Args)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
@@ -60,6 +68,72 @@ func main() {
 	}
 
 	fmt.Print(result)
+}
+
+// runColorMode handles the full color mode pipeline: validation, parsing, rendering,
+// and colorizing. It prints the colored ASCII art to stdout and exits with the
+// appropriate exit code on error.
+//
+// For multiline text (containing \n), each line is rendered and colorized separately
+// so that character widths and substring positions are computed per line.
+//
+// Parameters:
+//   - args: Command-line arguments including program name.
+func runColorMode(args []string) {
+	if err := flagparser.ParseArgs(args); err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(exitCodeUsageError)
+	}
+
+	colorSpec, substring, text, bannerName, err := extractColorArgs(args)
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(exitCodeUsageError)
+	}
+
+	rgb, err := color.Parse(colorSpec)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error: %v\n", err)
+		os.Exit(exitCodeColorError)
+	}
+
+	bannerPath, err := GetBannerPath(bannerName)
+	if err != nil {
+		fmt.Fprintln(os.Stderr, "Error:", err)
+		os.Exit(exitCodeUsageError)
+	}
+
+	charMap, err := parser.LoadBanner(bannerPath)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error loading banner file: %v\n", err)
+		os.Exit(exitCodeBannerError)
+	}
+
+	colorCode := color.ANSI(rgb)
+	lines := strings.Split(text, "\n")
+
+	for i, line := range lines {
+		if line == "" {
+			if i < len(lines)-1 {
+				fmt.Println()
+			}
+			continue
+		}
+
+		art, err := renderer.RendererASCII(line, charMap)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "Error rendering text: %v\n", err)
+			os.Exit(exitCodeRenderError)
+		}
+
+		artLines := strings.Split(strings.TrimSuffix(art, "\n"), "\n")
+		widths := parser.CharWidths(line, charMap)
+		colored := coloring.ApplyColor(artLines, line, substring, colorCode, widths)
+
+		for _, cl := range colored {
+			fmt.Println(cl)
+		}
+	}
 }
 
 // hasColorFlag checks whether any argument contains the --color= flag.
