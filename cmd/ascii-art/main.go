@@ -1,13 +1,20 @@
 // Package main provides the ASCII art generator CLI application.
 //
-// The application orchestrates the parser and renderer packages to convert text input
-// into graphical ASCII art representations. It handles command-line argument parsing,
-// banner file selection, and error reporting with appropriate exit codes.
+// The application orchestrates the parser, renderer, color, flagparser, and coloring
+// packages to convert text input into graphical ASCII art representations, optionally
+// with ANSI color support for full text or specific substrings.
+//
+// Usage:
+//
+//	go run . "text" [banner]
+//	go run . --color=<color> "text" [banner]
+//	go run . --color=<color> <substring> "text" [banner]
 //
 // Responsibilities of this package:
-//   - Parse command-line arguments
+//   - Parse and validate command-line arguments
+//   - Route between normal mode and color mode
 //   - Validate and resolve banner file paths
-//   - Coordinate between parser and renderer
+//   - Coordinate between parser, renderer, and coloring
 //   - Handle errors with appropriate exit codes
 //
 // Any invalid input, missing files, or rendering errors are reported to stderr.
