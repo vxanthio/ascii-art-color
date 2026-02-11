@@ -1,8 +1,12 @@
+// Package color_test contains unit tests for the color package.
+// Tests verify parsing of named, hex, and RGB color formats into RGB values,
+// and generation of ANSI escape sequences.
 package color_test
 
 import (
-	"ascii-art-color/internal/color"
 	"testing"
+
+	"ascii-art-color/internal/color"
 )
 
 func TestParse(t *testing.T) {
