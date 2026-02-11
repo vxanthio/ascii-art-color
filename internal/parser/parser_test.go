@@ -241,10 +241,12 @@ func TestLoadBannerCompleteCharacterSet(t *testing.T) {
 // for each character in the input text based on the banner glyph data.
 func TestCharWidths(t *testing.T) {
 	// Build a minimal banner with known glyph widths.
+	// All 8 lines of each glyph have the same width (banner format guarantee).
 	banner := Banner{
 		'H': {"_    _ ", "_|  |_ ", "_|  |_ ", "|_  _| ", " |  |  ", " |  |  ", "       ", "       "},
 		'i': {"   ", "   ", " _ ", "| |", "| |", "|_|", "   ", "   "},
 		' ': {"      ", "      ", "      ", "      ", "      ", "      ", "      ", "      "},
+		'!': {"_ ", "| ", "| ", "| ", "  ", "| ", "  ", "  "},
 	}
 
 	tests := []struct {
@@ -277,6 +279,36 @@ func TestCharWidths(t *testing.T) {
 			text: "Z",
 			want: []int{0},
 		},
+		{
+			name: "repeated chars same width",
+			text: "HHH",
+			want: []int{7, 7, 7},
+		},
+		{
+			name: "mixed known and unknown",
+			text: "HZi",
+			want: []int{7, 0, 3},
+		},
+		{
+			name: "special char",
+			text: "Hi!",
+			want: []int{7, 3, 2},
+		},
+		{
+			name: "spaces only",
+			text: "   ",
+			want: []int{6, 6, 6},
+		},
+		{
+			name: "single space",
+			text: " ",
+			want: []int{6},
+		},
+		{
+			name: "single narrow char",
+			text: "!",
+			want: []int{2},
+		},
 	}
 
 	for _, tt := range tests {
@@ -294,25 +326,96 @@ func TestCharWidths(t *testing.T) {
 	}
 }
 
-// TestCharWidths_RealBanner verifies CharWidths with actual loaded banner data.
-func TestCharWidths_RealBanner(t *testing.T) {
-	banner, err := LoadBanner("../../cmd/ascii-art/testdata/standard.txt")
-	if err != nil {
-		t.Fatalf("LoadBanner failed: %v", err)
-	}
+// TestCharWidths_EmptyBanner verifies CharWidths handles an empty banner map gracefully.
+func TestCharWidths_EmptyBanner(t *testing.T) {
+	banner := Banner{}
+	widths := CharWidths("Hello", banner)
 
-	widths := CharWidths("AB", banner)
-	if len(widths) != 2 {
-		t.Fatalf("expected 2 widths, got %d", len(widths))
+	if len(widths) != 5 {
+		t.Fatalf("expected 5 widths, got %d", len(widths))
 	}
-
-	// Each width should match len(glyph[0]) for that character.
-	for i, ch := range "AB" {
-		glyph := banner[ch]
-		expected := len(glyph[0])
-		if widths[i] != expected {
-			t.Errorf("width[%d] (%c) = %d, want %d", i, ch, widths[i], expected)
+	for i, w := range widths {
+		if w != 0 {
+			t.Errorf("widths[%d] = %d, want 0 for empty banner", i, w)
 		}
+	}
+}
+
+// TestCharWidths_RealBanners verifies CharWidths with actual loaded banner data
+// from all three banner files (standard, shadow, thinkertoy).
+func TestCharWidths_RealBanners(t *testing.T) {
+	bannerFiles := []struct {
+		name string
+		path string
+	}{
+		{"standard", "../../cmd/ascii-art/testdata/standard.txt"},
+		{"shadow", "../../cmd/ascii-art/testdata/shadow.txt"},
+		{"thinkertoy", "../../cmd/ascii-art/testdata/thinkertoy.txt"},
+	}
+
+	for _, bf := range bannerFiles {
+		t.Run(bf.name, func(t *testing.T) {
+			banner, err := LoadBanner(bf.path)
+			if err != nil {
+				t.Fatalf("LoadBanner(%s) failed: %v", bf.name, err)
+			}
+
+			text := "Hello World! 123 @#$"
+			widths := CharWidths(text, banner)
+
+			if len(widths) != len(text) {
+				t.Fatalf("expected %d widths, got %d", len(text), len(widths))
+			}
+
+			for i, ch := range text {
+				glyph := banner[ch]
+				if glyph == nil {
+					t.Errorf("char %c missing from %s banner", ch, bf.name)
+					continue
+				}
+				expected := len(glyph[0])
+				if widths[i] != expected {
+					t.Errorf("width[%d] (%c) = %d, want %d", i, ch, widths[i], expected)
+				}
+			}
+		})
+	}
+}
+
+// TestCharWidths_ConsistentGlyphLines verifies that all 8 lines of each glyph
+// have the same width, which is the assumption CharWidths relies on.
+func TestCharWidths_ConsistentGlyphLines(t *testing.T) {
+	bannerFiles := []struct {
+		name string
+		path string
+	}{
+		{"standard", "../../cmd/ascii-art/testdata/standard.txt"},
+		{"shadow", "../../cmd/ascii-art/testdata/shadow.txt"},
+		{"thinkertoy", "../../cmd/ascii-art/testdata/thinkertoy.txt"},
+	}
+
+	for _, bf := range bannerFiles {
+		t.Run(bf.name, func(t *testing.T) {
+			banner, err := LoadBanner(bf.path)
+			if err != nil {
+				t.Fatalf("LoadBanner(%s) failed: %v", bf.name, err)
+			}
+
+			for r := firstPrintable; r <= lastPrintable; r++ {
+				glyph := banner[r]
+				if glyph == nil {
+					t.Errorf("char %c missing", r)
+					continue
+				}
+				width := len(glyph[0])
+				for lineIdx, line := range glyph {
+					if len(line) != width {
+						t.Errorf("%s: char %c (ASCII %d) line %d width %d != line 0 width %d",
+							bf.name, r, r, lineIdx, len(line), width)
+					}
+				}
+			}
+		})
 	}
 }
 
