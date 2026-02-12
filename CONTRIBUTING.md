@@ -267,6 +267,7 @@ We use [Conventional Commits](https://www.conventionalcommits.org/) format:
 - `perf`: Performance improvements
 - `chore`: Maintenance tasks
 - `build`: Build system changes
+- `ci`: CI/CD workflow changes
 
 ### Scopes
 
@@ -279,6 +280,7 @@ We use [Conventional Commits](https://www.conventionalcommits.org/) format:
 - `tests`: Test-related
 - `docs`: Documentation
 - `build`: Build/tooling
+- `workflows`: CI/CD workflows
 
 ### Examples
 
@@ -343,6 +345,7 @@ When creating a PR, include:
    - [ ] Code formatted (`make fmt`)
    - [ ] Documentation updated
    - [ ] CHANGELOG.md updated
+   - [ ] CI passes on push/PR
 
 4. **Testing**
    - How was this tested?
@@ -351,15 +354,20 @@ When creating a PR, include:
 ### Review Process
 
 1. At least one approval required
-2. No merge conflicts
-3. Code follows style guide
-4. All tests pass locally
-5. Tests demonstrate functionality
+2. CI checks pass (test, lint, build run automatically on push/PR)
+3. No merge conflicts
+4. Code follows style guide
+5. All tests pass locally
+6. Tests demonstrate functionality
 
 ## Project Structure
 
 ```
 ascii-art-color/
+├── .github/
+│   └── workflows/
+│       ├── ci.yml             # CI workflow (test, lint, build)
+│       └── release.yml        # Release workflow (cross-platform binaries)
 ├── .gitignore                 # Git ignore rules
 ├── .golangci.yml              # Linter configuration
 ├── LICENSE                    # Project license
