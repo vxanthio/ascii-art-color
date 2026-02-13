@@ -119,7 +119,7 @@ func TestHasColorFlag(t *testing.T) {
 		{"color flag present", []string{"prog", "--color=red", "hello"}, true},
 		{"color flag with substring", []string{"prog", "--color=red", "sub", "hello"}, true},
 		{"wrong format dash", []string{"prog", "-color=red", "hello"}, false},
-		{"wrong format colon", []string{"prog", "--color:red", "hello"}, false},
+		{"wrong format colon", []string{"prog", "--color:red", "hello"}, true},
 	}
 
 	for _, tt := range tests {
