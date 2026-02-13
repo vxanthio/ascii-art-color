@@ -33,15 +33,17 @@ sequenceDiagram
     color-->>main: "\033[38;2;R;G;Bm"
 
     loop For each line in text
-        main->>renderer: RendererASCII(line, banner)
-        renderer-->>main: []string (ASCII art lines)
+        main->>renderer: ASCII(line, banner)
+        renderer-->>main: string (ASCII art with \n)
+
+        main->>main: split rendered ASCII into artLines
 
         main->>parser: CharWidths(line, banner)
         parser-->>main: []int (character widths)
 
         main->>coloring: ApplyColor(artLines, line, substring, colorCode, widths)
 
-        Note over coloring: findPositions(text, substring)<br/>colorLine() for each art line
+        Note over coloring: findPositions(line, substring)<br/>colorLine() for each art line
 
         coloring-->>main: []string (colored lines)
     end
@@ -67,7 +69,7 @@ sequenceDiagram
     main->>parser: LoadBanner(path)
     parser-->>main: Banner map[rune][]string
 
-    main->>renderer: RendererASCII(text, banner)
+    main->>renderer: ASCII(text, banner)
     renderer-->>main: ASCII art string
 
     main->>User: Plain ASCII art to stdout
