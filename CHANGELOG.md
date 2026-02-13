@@ -48,6 +48,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Project restructured to `cmd/internal` layout
   - Main package moved to `cmd/ascii-art/`
   - Internal packages moved to `internal/`
+- Renamed renderer exported API from `RendererASCII()` to `ASCII()` and updated all call sites/tests/docs
 - Updated all documentation for v1.1.0
   - README.md with color usage examples and correct project structure
   - AGENTS.md with new packages, exit codes, and commands
@@ -71,7 +72,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Comprehensive error handling with wrapped errors
   - Security annotations for file operations
 - Renderer package for converting text to ASCII art
-  - `RendererASCII()` main rendering function with newline support
+  - `ASCII()` main rendering function with newline support
   - `validateBannerCharacters()` for character validation
   - `validateInput()` for input validation
   - Efficient string building with `strings.Builder`
