@@ -378,6 +378,11 @@ ascii-art-color/
 ├── CONTRIBUTING.md            # This file
 ├── PERMISSIONS.md             # Team permissions
 ├── README.md                  # User documentation
+├── diagrams/                  # Mermaid architecture diagrams
+│   ├── architecture.md        # High-level system overview
+│   ├── class-diagram.md       # Package types and relationships
+│   ├── flowchart.md           # Program execution flow
+│   └── sequence-diagram.md    # Color mode call sequence
 ├── cmd/
 │   └── ascii-art/
 │       ├── main.go            # CLI entry point

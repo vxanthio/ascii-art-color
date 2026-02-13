@@ -149,6 +149,11 @@ ascii-art-color/
 ├── CONTRIBUTING.md            # Contribution guidelines
 ├── PERMISSIONS.md             # Team permissions
 ├── README.md                  # This file
+├── diagrams/                  # Mermaid architecture diagrams
+│   ├── architecture.md        # High-level system overview
+│   ├── class-diagram.md       # Package types and relationships
+│   ├── flowchart.md           # Program execution flow
+│   └── sequence-diagram.md    # Color mode call sequence
 ├── cmd/
 │   └── ascii-art/
 │       ├── main.go            # CLI entry point
@@ -215,6 +220,9 @@ The project follows a clean architecture with six packages:
 - **coloring** (`internal/coloring`): ANSI color application to rendered ASCII art
 - **flagparser** (`internal/flagparser`): Command-line argument validation
 
+For visual diagrams see the [diagrams/](diagrams/) folder:
+[Architecture Overview](diagrams/architecture.md) | [Flowchart](diagrams/flowchart.md) | [Class Diagram](diagrams/class-diagram.md) | [Sequence Diagram](diagrams/sequence-diagram.md)
+
 ## Test Coverage
 
 - **color**: 97.7%
@@ -234,6 +242,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for contribution guidelines.
 - [CHANGELOG.md](CHANGELOG.md) - Version history
 - [CONTRIBUTING.md](CONTRIBUTING.md) - Contribution guidelines
 - [PERMISSIONS.md](PERMISSIONS.md) - Team permissions
+- [diagrams/](diagrams/) - Mermaid architecture diagrams
 
 ## License
 

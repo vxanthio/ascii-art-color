@@ -40,6 +40,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Builds cross-platform binaries (Linux, macOS, Windows)
   - Creates GitHub Release with all binaries attached
 - CI status badge in README.md
+- Mermaid architecture diagrams in `diagrams/` folder
+  - Architecture overview, flowchart, class diagram, and sequence diagram
+  - Renders natively on GitHub
 
 ### Changed
 - Project restructured to `cmd/internal` layout
