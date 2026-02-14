@@ -67,7 +67,7 @@ vet:
 lint:
 	@echo "${COLOUR_BLUE}Running linters...${COLOUR_END}"
 	@if command -v golangci-lint > /dev/null; then \
-		golangci-lint run; \
+		golangci-lint run && \
 		echo "${COLOUR_GREEN}✓ Linters passed${COLOUR_END}"; \
 	else \
 		echo "${COLOUR_RED}✗ golangci-lint not installed${COLOUR_END}"; \
