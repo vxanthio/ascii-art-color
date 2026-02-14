@@ -1,11 +1,12 @@
 package parser
 
 import (
+	"os"
 	"testing"
 )
 
 func TestLoadBannerSpaceChar(t *testing.T) {
-	banner, err := LoadBanner("../../cmd/ascii-art/testdata/shadow.txt")
+	banner, err := LoadBanner(os.DirFS("../../cmd/ascii-art/testdata"), "shadow.txt")
 	if err != nil {
 		t.Fatalf("LoadBanner failed: %v", err)
 	}
@@ -39,14 +40,14 @@ func TestLoadBannerSpaceChar(t *testing.T) {
 }
 
 func TestLoadBannerMissingFile(t *testing.T) {
-	_, err := LoadBanner("../../cmd/ascii-art/testdata/nope.txt")
+	_, err := LoadBanner(os.DirFS("../../cmd/ascii-art/testdata"), "nope.txt")
 	if err == nil {
 		t.Errorf("expected error for missing file, got nil")
 	}
 }
 
 func TestLoadBannerExclamationChar(t *testing.T) {
-	banner, err := LoadBanner("../../cmd/ascii-art/testdata/shadow.txt")
+	banner, err := LoadBanner(os.DirFS("../../cmd/ascii-art/testdata"), "shadow.txt")
 	if err != nil {
 		t.Fatalf("LoadBanner Failed: %v", err)
 	}
@@ -76,7 +77,7 @@ func TestLoadBannerExclamationChar(t *testing.T) {
 }
 
 func TestLoadBannerStandardSpace(t *testing.T) {
-	banner, err := LoadBanner("../../cmd/ascii-art/testdata/standard.txt")
+	banner, err := LoadBanner(os.DirFS("../../cmd/ascii-art/testdata"), "standard.txt")
 	if err != nil {
 		t.Fatalf("loadBanner failed: %v", err)
 	}
@@ -107,7 +108,7 @@ func TestLoadBannerStandardSpace(t *testing.T) {
 }
 
 func TestLoadBannerShadowA(t *testing.T) {
-	banner, err := LoadBanner("../../cmd/ascii-art/testdata/shadow.txt")
+	banner, err := LoadBanner(os.DirFS("../../cmd/ascii-art/testdata"), "shadow.txt")
 	if err != nil {
 		t.Fatalf("LoadBanner failed: %v", err)
 	}
@@ -140,28 +141,28 @@ func TestLoadBannerShadowA(t *testing.T) {
 }
 
 func TestLoadBannerEmptyFile(t *testing.T) {
-	_, err := LoadBanner("../../cmd/ascii-art/testdata/empty.txt")
+	_, err := LoadBanner(os.DirFS("../../cmd/ascii-art/testdata"), "empty.txt")
 	if err == nil {
 		t.Error("expected error for empty file, got nil")
 	}
 }
 
 func TestLoadBannerCorruptedFile(t *testing.T) {
-	_, err := LoadBanner("../../cmd/ascii-art/testdata/corrupted.txt")
+	_, err := LoadBanner(os.DirFS("../../cmd/ascii-art/testdata"), "corrupted.txt")
 	if err == nil {
 		t.Error("expected error for corrupted file, got nil")
 	}
 }
 
 func TestLoadBannerOversizedFile(t *testing.T) {
-	_, err := LoadBanner("../../cmd/ascii-art/testdata/oversized.txt")
+	_, err := LoadBanner(os.DirFS("../../cmd/ascii-art/testdata"), "oversized.txt")
 	if err == nil {
 		t.Error("expected error for oversized file, got nil")
 	}
 }
 
 func TestLoadBannerThinkertoy(t *testing.T) {
-	banner, err := LoadBanner("../../cmd/ascii-art/testdata/thinkertoy.txt")
+	banner, err := LoadBanner(os.DirFS("../../cmd/ascii-art/testdata"), "thinkertoy.txt")
 	if err != nil {
 		t.Fatalf("thinkertoy failed: %v", err)
 	}
@@ -171,7 +172,7 @@ func TestLoadBannerThinkertoy(t *testing.T) {
 }
 
 func TestLoadBannerNumbers(t *testing.T) {
-	banner, err := LoadBanner("../../cmd/ascii-art/testdata/standard.txt")
+	banner, err := LoadBanner(os.DirFS("../../cmd/ascii-art/testdata"), "standard.txt")
 	if err != nil {
 		t.Fatalf("LoadBanner failed: %v", err)
 	}
@@ -190,7 +191,7 @@ func TestLoadBannerNumbers(t *testing.T) {
 }
 
 func TestLoadBannerCompleteCharacterSet(t *testing.T) {
-	banner, err := LoadBanner("../../cmd/ascii-art/testdata/standard.txt")
+	banner, err := LoadBanner(os.DirFS("../../cmd/ascii-art/testdata"), "standard.txt")
 	if err != nil {
 		t.Fatalf("LoadBanner failed: %v", err)
 	}
@@ -316,14 +317,15 @@ func TestCharWidths_RealBanners(t *testing.T) {
 		name string
 		path string
 	}{
-		{"standard", "../../cmd/ascii-art/testdata/standard.txt"},
-		{"shadow", "../../cmd/ascii-art/testdata/shadow.txt"},
-		{"thinkertoy", "../../cmd/ascii-art/testdata/thinkertoy.txt"},
+		{"standard", "standard.txt"},
+		{"shadow", "shadow.txt"},
+		{"thinkertoy", "thinkertoy.txt"},
 	}
 
+	testdataFS := os.DirFS("../../cmd/ascii-art/testdata")
 	for _, bf := range bannerFiles {
 		t.Run(bf.name, func(t *testing.T) {
-			banner, err := LoadBanner(bf.path)
+			banner, err := LoadBanner(testdataFS, bf.path)
 			if err != nil {
 				t.Fatalf("LoadBanner(%s) failed: %v", bf.name, err)
 			}
@@ -355,14 +357,15 @@ func TestCharWidths_ConsistentGlyphLines(t *testing.T) {
 		name string
 		path string
 	}{
-		{"standard", "../../cmd/ascii-art/testdata/standard.txt"},
-		{"shadow", "../../cmd/ascii-art/testdata/shadow.txt"},
-		{"thinkertoy", "../../cmd/ascii-art/testdata/thinkertoy.txt"},
+		{"standard", "standard.txt"},
+		{"shadow", "shadow.txt"},
+		{"thinkertoy", "thinkertoy.txt"},
 	}
 
+	testdataFS := os.DirFS("../../cmd/ascii-art/testdata")
 	for _, bf := range bannerFiles {
 		t.Run(bf.name, func(t *testing.T) {
-			banner, err := LoadBanner(bf.path)
+			banner, err := LoadBanner(testdataFS, bf.path)
 			if err != nil {
 				t.Fatalf("LoadBanner(%s) failed: %v", bf.name, err)
 			}
@@ -386,7 +389,7 @@ func TestCharWidths_ConsistentGlyphLines(t *testing.T) {
 }
 
 func TestLoadBannerAllSpecialCharacters(t *testing.T) {
-	banner, err := LoadBanner("../../cmd/ascii-art/testdata/standard.txt")
+	banner, err := LoadBanner(os.DirFS("../../cmd/ascii-art/testdata"), "standard.txt")
 	if err != nil {
 		t.Fatalf("LoadBanner failed: %v", err)
 	}
