@@ -1,12 +1,9 @@
-// Package main_test contains unit tests for the main package functions.
-// Tests verify command-line argument parsing and banner path resolution.
 package main
 
 import (
 	"testing"
 )
 
-// TestParseArgs_NoArguments verifies ParseArgs returns an error when no text argument is provided.
 func TestParseArgs_NoArguments(t *testing.T) {
 	args := []string{"./ascii-art"}
 
@@ -22,7 +19,6 @@ func TestParseArgs_NoArguments(t *testing.T) {
 	}
 }
 
-// TestParseArgs_TextOnly verifies ParseArgs defaults to "standard" banner when no banner is specified.
 func TestParseArgs_TextOnly(t *testing.T) {
 	args := []string{"./ascii-art", "Hello"}
 
@@ -41,7 +37,6 @@ func TestParseArgs_TextOnly(t *testing.T) {
 	}
 }
 
-// TestParseArgs_TextAndBanner verifies ParseArgs correctly parses both text and banner arguments.
 func TestParseArgs_TextAndBanner(t *testing.T) {
 	args := []string{"./ascii-art", "Hello", "shadow"}
 
@@ -60,7 +55,6 @@ func TestParseArgs_TextAndBanner(t *testing.T) {
 	}
 }
 
-// TestParseArgs_TooManyArguments verifies ParseArgs returns an error when too many arguments are provided.
 func TestParseArgs_TooManyArguments(t *testing.T) {
 	args := []string{"./ascii-art", "Hello", "shadow", "extra"}
 
@@ -71,7 +65,6 @@ func TestParseArgs_TooManyArguments(t *testing.T) {
 	}
 }
 
-// TestParseArgs_AllBannerTypes verifies ParseArgs accepts all valid banner type names.
 func TestParseArgs_AllBannerTypes(t *testing.T) {
 	testCases := []struct {
 		args           []string
@@ -96,7 +89,6 @@ func TestParseArgs_AllBannerTypes(t *testing.T) {
 	}
 }
 
-// TestParseArgs_EmptyStringText verifies ParseArgs handles empty string as valid text input.
 func TestParseArgs_EmptyStringText(t *testing.T) {
 	args := []string{"./ascii-art", ""}
 
@@ -115,7 +107,121 @@ func TestParseArgs_EmptyStringText(t *testing.T) {
 	}
 }
 
-// TestGetBannerPath_ValidBanners verifies GetBannerPath correctly maps banner names to file paths.
+func TestHasColorFlag(t *testing.T) {
+	tests := []struct {
+		name string
+		args []string
+		want bool
+	}{
+		{"no args", []string{"prog"}, false},
+		{"text only", []string{"prog", "hello"}, false},
+		{"text and banner", []string{"prog", "hello", "shadow"}, false},
+		{"color flag present", []string{"prog", "--color=red", "hello"}, true},
+		{"color flag with substring", []string{"prog", "--color=red", "sub", "hello"}, true},
+		{"wrong format dash", []string{"prog", "-color=red", "hello"}, false},
+		{"wrong format colon", []string{"prog", "--color:red", "hello"}, true},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := hasColorFlag(tt.args)
+			if got != tt.want {
+				t.Errorf("hasColorFlag(%v) = %v, want %v", tt.args, got, tt.want)
+			}
+		})
+	}
+}
+
+func TestExtractColorArgs(t *testing.T) {
+	tests := []struct {
+		name      string
+		args      []string
+		wantColor string
+		wantSub   string
+		wantText  string
+		wantBnr   string
+		wantErr   bool
+	}{
+		{
+			name:      "flag and text only",
+			args:      []string{"prog", "--color=red", "hello"},
+			wantColor: "red", wantSub: "", wantText: "hello", wantBnr: "standard",
+		},
+		{
+			name:      "flag text and banner",
+			args:      []string{"prog", "--color=red", "hello", "shadow"},
+			wantColor: "red", wantSub: "", wantText: "hello", wantBnr: "shadow",
+		},
+		{
+			name:      "flag substring and text",
+			args:      []string{"prog", "--color=red", "sub", "hello"},
+			wantColor: "red", wantSub: "sub", wantText: "hello", wantBnr: "standard",
+		},
+		{
+			name:      "flag substring text and banner",
+			args:      []string{"prog", "--color=red", "sub", "hello", "thinkertoy"},
+			wantColor: "red", wantSub: "sub", wantText: "hello", wantBnr: "thinkertoy",
+		},
+		{
+			name:      "audit case orange GuYs",
+			args:      []string{"prog", "--color=orange", "GuYs", "HeY GuYs"},
+			wantColor: "orange", wantSub: "GuYs", wantText: "HeY GuYs", wantBnr: "standard",
+		},
+		{
+			name:      "audit case blue B",
+			args:      []string{"prog", "--color=blue", "B", "RGB()"},
+			wantColor: "blue", wantSub: "B", wantText: "RGB()", wantBnr: "standard",
+		},
+		{
+			name:      "hex color",
+			args:      []string{"prog", "--color=#ff0000", "hello"},
+			wantColor: "#ff0000", wantSub: "", wantText: "hello", wantBnr: "standard",
+		},
+		{
+			name:      "rgb color",
+			args:      []string{"prog", "--color=rgb(255,0,0)", "hello"},
+			wantColor: "rgb(255,0,0)", wantSub: "", wantText: "hello", wantBnr: "standard",
+		},
+		{
+			name:      "newline in text",
+			args:      []string{"prog", "--color=red", "hello\\nworld"},
+			wantColor: "red", wantSub: "", wantText: "hello\nworld", wantBnr: "standard",
+		},
+		{
+			name:    "missing text after flag",
+			args:    []string{"prog", "--color=red"},
+			wantErr: true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			colorSpec, sub, text, bnr, err := extractColorArgs(tt.args)
+			if tt.wantErr {
+				if err == nil {
+					t.Fatalf("expected error, got nil")
+				}
+				return
+			}
+			if err != nil {
+				t.Fatalf("unexpected error: %v", err)
+			}
+			if colorSpec != tt.wantColor {
+				t.Errorf("color = %q, want %q", colorSpec, tt.wantColor)
+			}
+			if sub != tt.wantSub {
+				t.Errorf("substring = %q, want %q", sub, tt.wantSub)
+			}
+			if text != tt.wantText {
+				t.Errorf("text = %q, want %q", text, tt.wantText)
+			}
+			if bnr != tt.wantBnr {
+				t.Errorf("banner = %q, want %q", bnr, tt.wantBnr)
+			}
+		})
+	}
+}
+
 func TestGetBannerPath_ValidBanners(t *testing.T) {
 	testCases := []struct {
 		banner       string
@@ -140,7 +246,6 @@ func TestGetBannerPath_ValidBanners(t *testing.T) {
 	}
 }
 
-// TestGetBannerPath_InvalidBanner verifies GetBannerPath returns an error for invalid banner names.
 func TestGetBannerPath_InvalidBanner(t *testing.T) {
 	banner := "invalid"
 

@@ -1,0 +1,138 @@
+# CI Workflow — runs on every push/PR to main and develop branches.
+# Ensures code quality by running tests, linting, and build verification
+# in parallel. All three jobs must pass before a PR can be merged.
+name: CI
+
+# TRIGGERS: Define when this workflow runs.
+# - push: runs when code is pushed directly to main or develop
+# - pull_request: runs when a PR is opened/updated targeting main or develop
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+# JOBS: Each job runs on a separate virtual machine, in parallel by default.
+# The three jobs (test, lint, build) start simultaneously.
+jobs:
+
+  # ─── TEST JOB ──────────────────────────────────────────────────────────
+  # Runs the full test suite across multiple Go versions and operating systems.
+  # Uses a "matrix" strategy to run 6 combinations in parallel:
+  #   Go 1.21 × (Ubuntu, macOS, Windows) = 3 runs
+  #   Go 1.22 × (Ubuntu, macOS, Windows) = 3 runs
+  test:
+    name: Test (Go ${{ matrix.go-version }}, ${{ matrix.os }})
+    # MATRIX: GitHub creates one job instance per combination of variables.
+    # "runs-on" uses the os variable from the matrix.
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        # Test on two Go versions as required by acceptance criteria
+        go-version: ['1.21', '1.22']
+        # Test on all three major platforms to verify cross-platform support
+        os: [ubuntu-latest, macos-latest, windows-latest]
+
+    steps:
+      # Step 1: Clone the repository into the CI virtual machine.
+      # Without this, the VM is empty — it has no access to your code.
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Step 2: Install the Go version specified by the matrix.
+      # actions/setup-go also sets up module caching automatically,
+      # so repeated runs download dependencies faster.
+      - name: Set up Go ${{ matrix.go-version }}
+        uses: actions/setup-go@v5
+        with:
+          go-version: ${{ matrix.go-version }}
+
+      # Step 3: Run all tests across all packages.
+      # ./... means "all packages in the module recursively".
+      - name: Run tests
+        run: go test ./...
+
+  # ─── COVERAGE JOB ───────────────────────────────────────────────────────
+  # Generates a full test coverage report on Ubuntu + Go 1.22 and uploads
+  # artifacts for inspection/download from the workflow run page.
+  coverage:
+    name: Coverage
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.22'
+
+      - name: Generate coverage profile
+        run: go test -covermode=atomic -coverprofile=coverage.out ./...
+
+      - name: Generate coverage summary
+        run: |
+          go tool cover -func=coverage.out | tee coverage-summary.txt
+          echo "## Coverage Report" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo '```text' >> "$GITHUB_STEP_SUMMARY"
+          cat coverage-summary.txt >> "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload coverage artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: |
+            coverage.out
+            coverage-summary.txt
+
+  # ─── LINT JOB ──────────────────────────────────────────────────────────
+  # Runs golangci-lint to enforce code quality standards.
+  # Only runs on Ubuntu because linting analyzes source code text —
+  # the results are identical regardless of OS.
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.22'
+
+      # The official golangci-lint GitHub Action.
+      # It automatically installs golangci-lint and runs it.
+      # It reads .golangci.yml from the repo root for configuration.
+      # "version" specifies which golangci-lint version to install.
+      # Note: golangci-lint v2.x requires action v7 or higher.
+      - name: Run golangci-lint
+        uses: golangci/golangci-lint-action@v7
+        with:
+          version: v2.1.6
+
+  # ─── BUILD JOB ─────────────────────────────────────────────────────────
+  # Verifies the project compiles successfully.
+  # Only runs on Ubuntu because Go cross-compiles natively —
+  # if it builds on Linux, the code is valid Go.
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.22'
+
+      # Build the binary. This catches compilation errors that tests
+      # might miss (e.g. unused imports in non-test files).
+      - name: Build binary
+        run: go build -o bin/ascii-art ./cmd/ascii-art

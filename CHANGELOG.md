@@ -5,9 +5,76 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.0] - 2026-02-13
+
+### Added
+- Embedded filesystem for banner files using Go's `embed` package
+  - Banner files bundled into binary at compile time
+  - Binary is now fully relocatable and self-contained
+  - No external testdata files required at runtime
+- `GetBannerFS()` function in main package to expose embedded filesystem
+- Binary integration test (`TestBuiltBinary_FromRepoRoot`) to validate relocatability
+- Color package (`internal/color`) for parsing color specifications
+  - Named colors: red, green, blue, yellow, cyan, magenta, white, black, orange, purple, pink, brown, gray
+  - Hex format: `#RRGGBB`
+  - RGB format: `rgb(R,G,B)`
+  - `Parse()` function to convert color specs to RGB values
+  - `ANSI()` function to generate 24-bit ANSI escape sequences
+- Coloring package (`internal/coloring`) for applying ANSI colors to ASCII art
+  - `ApplyColor()` function for full-text and substring coloring
+  - Accurate column mapping using character widths
+  - Support for non-contiguous and overlapping substring matches
+- Flagparser package (`internal/flagparser`) for CLI argument validation
+  - `ParseArgs()` function to validate `--color=` flag syntax
+  - Argument count, flag position, and empty value checks
+- `--color` CLI flag for colored ASCII art output
+  - Full text coloring: `--color=red "text"`
+  - Substring coloring: `--color=red substring "text"`
+  - Works with all banner styles
+- `CharWidths()` function in parser package for per-character column widths
+- Color mode routing in main (`hasColorFlag`, `runColorMode`, `extractColorArgs`)
+- Exit code 4 for color parse errors
+- Comprehensive integration tests for color mode (18 test cases)
+- Unit tests for all new functions and packages
+- `run-color` Makefile target
+- CI workflow (`.github/workflows/ci.yml`) with test, lint, and build jobs
+  - Test matrix: Go 1.21/1.22 on Ubuntu, macOS, and Windows
+  - Lint: golangci-lint v2.1.6
+  - Build verification on Ubuntu
+- Release workflow (`.github/workflows/release.yml`) for automated binary distribution
+  - Triggered on `v*` tags
+  - Builds cross-platform binaries (Linux, macOS, Windows)
+  - Creates GitHub Release with all binaries attached
+- CI status badge in README.md
+- Mermaid architecture diagrams in `diagrams/` folder
+  - Architecture overview, flowchart, class diagram, and sequence diagram
+  - Renders natively on GitHub
+
+### Changed
+- `parser.LoadBanner()` signature changed from `LoadBanner(path string)` to `LoadBanner(fsys fs.FS, path string)`
+  - Accepts any `fs.FS` implementation (embedded, disk, testing, etc.)
+  - Enables dependency injection for filesystem operations
+- `parser.readLines()` now uses `fs.ReadFile()` instead of `os.Open()`
+- Test files updated to use `os.DirFS()` for reading real files from disk
+- Architecture diagrams updated to show new `fs.FS` parameter
+- Project restructured to `cmd/internal` layout
+  - Main package moved to `cmd/ascii-art/`
+  - Internal packages moved to `internal/`
+- Renamed renderer exported API from `RendererASCII()` to `ASCII()` and updated all call sites/tests/docs
+- Updated all documentation for v1.1.0
+  - README.md with color usage examples and correct project structure
+  - AGENTS.md with new packages, exit codes, and commands
+  - CONTRIBUTING.md with updated structure and scopes
+  - Makefile paths updated for `cmd/ascii-art/` layout
+- Function documentation standardized with Parameters/Returns sections
+- Test files given package-level doc comments
+- Fixed goimports ordering in color_test.go and coloring_test.go
+
+---
+
 ## [1.0.0] - 2026-01-10
 
-**Final Release** - Complete implementation ready for submission.
+**Final Release** - Complete implementation.
 
 ### Added
 - Parser package for reading and parsing ASCII art banner files
@@ -17,7 +84,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Comprehensive error handling with wrapped errors
   - Security annotations for file operations
 - Renderer package for converting text to ASCII art
-  - `RendererASCII()` main rendering function with newline support
+  - `ASCII()` main rendering function with newline support
   - `validateBannerCharacters()` for character validation
   - `validateInput()` for input validation
   - Efficient string building with `strings.Builder`

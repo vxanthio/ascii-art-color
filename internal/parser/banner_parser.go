@@ -14,8 +14,9 @@ package parser
 
 import (
 	"bufio"
+	"bytes"
 	"fmt"
-	"os"
+	"io/fs"
 )
 
 const (
@@ -30,20 +31,22 @@ const (
 // Banner represents the ASCII-art data for all supported characters.
 type Banner map[rune][]string
 
-// LoadBanner reads a banner file and returns its parsed representation as a Banner map.
+// LoadBanner reads a banner file from the provided filesystem and returns its parsed
+// representation as a Banner map.
 //
 // The function reads the specified banner file, validates its format (855 lines total),
 // and constructs a map associating each printable ASCII character (32-126) with its
 // 8-line ASCII art representation.
 //
 // Parameters:
-//   - path: The file path to the banner file (e.g., "testdata/standard.txt").
+//   - fsys: The filesystem to read from (can be embed.FS, os.DirFS, or any fs.FS).
+//   - path: The file path within the filesystem (e.g., "testdata/standard.txt").
 //
 // Returns:
 //   - A Banner map containing all character definitions.
 //   - An error if the file cannot be read or the format is invalid.
-func LoadBanner(path string) (Banner, error) {
-	lines, err := readLines(path)
+func LoadBanner(fsys fs.FS, path string) (Banner, error) {
+	lines, err := readLines(fsys, path)
 	if err != nil {
 		return nil, fmt.Errorf("failed to read banner file %q: %w", path, err)
 	}
@@ -54,25 +57,26 @@ func LoadBanner(path string) (Banner, error) {
 	return banner, nil
 }
 
-// readLines opens a file and returns all its lines as a slice of strings.
+// readLines reads all lines from a file in the provided filesystem.
 //
-// The function uses a buffered scanner to read the file line by line efficiently.
+// The function uses fs.ReadFile to read the file content, then scans it line by line.
+// This approach works with both embedded filesystems and disk-based filesystems.
 // It handles both reading errors and scanner errors appropriately.
 //
 // Parameters:
-//   - path: The file path to read.
+//   - fsys: The filesystem to read from (can be embed.FS, os.DirFS, or any fs.FS).
+//   - path: The file path within the filesystem.
 //
 // Returns:
 //   - A slice containing all lines from the file.
 //   - An error if the file cannot be opened or read.
-func readLines(path string) ([]string, error) {
-	file, err := os.Open(path) // #nosec G304 -- trusted banner files
+func readLines(fsys fs.FS, path string) ([]string, error) {
+	data, err := fs.ReadFile(fsys, path)
 	if err != nil {
 		return nil, err
 	}
-	defer file.Close() //nolint:errcheck // read-only file
 
-	scanner := bufio.NewScanner(file)
+	scanner := bufio.NewScanner(bytes.NewReader(data))
 	var lines []string
 	for scanner.Scan() {
 		lines = append(lines, scanner.Text())
@@ -85,8 +89,17 @@ func readLines(path string) ([]string, error) {
 }
 
 // buildBanner constructs a Banner map from the raw lines read from a banner file.
-// It validates the format and creates a mapping from each printable ASCII character
-// (32-126) to its 8-line ASCII art representation.
+//
+// It validates the format (855 total lines, 95 characters with 8 lines each plus
+// 1 separator) and creates a mapping from each printable ASCII character (32-126)
+// to its 8-line ASCII art representation.
+//
+// Parameters:
+//   - lines: The raw lines from a banner file.
+//
+// Returns:
+//   - A Banner map containing all character definitions.
+//   - An error if the format is invalid or incomplete.
 func buildBanner(lines []string) (Banner, error) {
 	if len(lines) == 0 {
 		return nil, fmt.Errorf("empty banner file")
@@ -112,4 +125,26 @@ func buildBanner(lines []string) (Banner, error) {
 			len(banner), totalChars)
 	}
 	return banner, nil
+}
+
+// CharWidths returns the column width of each character in text based on the
+// provided Banner glyph data. Each width corresponds to len(glyph[0]) for the
+// character's ASCII art representation. Unknown characters get width 0.
+//
+// Parameters:
+//   - text: The input string whose character widths are needed.
+//   - banner: The loaded Banner map containing glyph data.
+//
+// Returns:
+//   - A slice of integers with one width per character in text.
+func CharWidths(text string, banner Banner) []int {
+	widths := make([]int, len(text))
+	for i, char := range text {
+		glyph := banner[char]
+		if glyph == nil {
+			continue
+		}
+		widths[i] = len(glyph[0])
+	}
+	return widths
 }

@@ -1,53 +1,125 @@
+# golangci-lint configuration file (v2 format)
+# Docs: https://golangci-lint.run/usage/configuration/
+
+# Config file version — must be "2" for golangci-lint v2+
 version: "2"
+
+# =============================================================================
+# RUN: Controls how golangci-lint executes
+# =============================================================================
 run:
+  # Also lint test files (*_test.go) — set to false to skip them
   tests: true
+
+# =============================================================================
+# OUTPUT: Controls how results are displayed
+# =============================================================================
 output:
   formats:
     text:
+      # Print results to stdout (terminal)
       path: stdout
+      # Show which linter flagged each issue (e.g. "[goconst]")
       print-linter-name: true
+      # Show the source code line where the issue was found
       print-issued-lines: true
+
+# =============================================================================
+# LINTERS: Which linters to enable and how to configure them
+# =============================================================================
+# By default, golangci-lint runs a set of "default" linters (govet, errcheck,
+# staticcheck, etc.). The "enable" list below adds EXTRA linters on top of
+# those defaults.
 linters:
   enable:
+    # dupl: Detects copy-pasted (duplicated) code blocks
     - dupl
+    # goconst: Finds repeated string literals that should be constants
     - goconst
+    # gocyclo: Reports functions with high cyclomatic complexity
     - gocyclo
+    # gosec: Inspects code for security vulnerabilities (SQL injection, path traversal, etc.)
     - gosec
+    # misspell: Catches common spelling mistakes in comments and strings
     - misspell
+    # prealloc: Suggests preallocating slices when the size can be determined
     - prealloc
+    # revive: Fast, configurable Go linter (replacement for golint) — checks style and conventions
     - revive
+    # staticcheck: Advanced static analysis (nil dereferences, unreachable code, deprecated APIs, etc.)
     - staticcheck
+    # unconvert: Removes unnecessary type conversions (e.g. string(myString))
     - unconvert
+    # unparam: Reports unused function parameters
     - unparam
+
+  # ============ Per-linter settings ============
   settings:
     dupl:
+      # Minimum number of tokens before a code block is considered a duplicate
+      # Lower = stricter (catches smaller duplicates), higher = more lenient
       threshold: 100
+
     errcheck:
+      # Flag unchecked errors in type assertions: v := x.(Type) without ok check
       check-type-assertions: true
+      # Flag errors explicitly ignored with _ (e.g. _ = f())
       check-blank: true
+
     goconst:
+      # Minimum string length to consider for constant extraction
       min-len: 2
+      # How many times a string must appear before suggesting a constant
       min-occurrences: 2
+
     gocritic:
+      # Disable specific checks that produce false positives or noise
       disabled-checks:
         - unnecessaryBlock
+      # Enable groups of checks by tag:
+      #   diagnostic: likely bugs and correctness issues
+      #   style: code style suggestions
+      #   performance: performance improvement suggestions
       enabled-tags:
         - diagnostic
         - style
         - performance
+
     gocyclo:
+      # Maximum allowed cyclomatic complexity per function
+      # Complexity = number of independent paths through a function
+      # 15 is a reasonable limit; >15 suggests the function should be split
       min-complexity: 15
+
     govet:
-      disable:
-        - fieldalignment
+      # Enable all govet analyzers except fieldalignment
       enable-all: true
+      disable:
+        # fieldalignment: Suggests reordering struct fields to reduce memory
+        # Disabled because it prioritizes memory over readability
+        - fieldalignment
+
     lll:
+      # Maximum line length allowed (characters)
       line-length: 120
+
     misspell:
+      # Use US English spelling (e.g. "color" not "colour")
       locale: US
+
+  # ============ Exclusion rules ============
+  # Suppress specific linter warnings in certain contexts
   exclusions:
+    # How to handle generated files: "lax" = skip most checks on generated code
     generated: lax
     rules:
+      # In test files, relax these linters:
+      #   - dupl: Test cases often have similar structure (table-driven tests)
+      #   - errcheck: Tests commonly ignore errors for brevity
+      #   - fieldalignment: Not relevant in tests
+      #   - goconst: Repeated test strings are acceptable
+      #   - gocyclo: Test functions can be long with many subtests
+      #   - gosec: Hardcoded test values are not security risks
       - linters:
           - dupl
           - errcheck
@@ -56,24 +128,48 @@ linters:
           - gocyclo
           - gosec
         path: _test\.go
+
+      # Additional fieldalignment exclusion for integration tests
       - linters:
           - fieldalignment
         path: .*_test\.go$|integration_test\.go$
+
+    # Directories to completely exclude from linting
     paths:
       - third_party$
       - builtin$
       - examples$
+
+# =============================================================================
+# ISSUES: Controls how issues are reported
+# =============================================================================
 issues:
+  # 0 = no limit — report ALL issues found per linter (default caps at 50)
   max-issues-per-linter: 0
+  # 0 = no limit — report ALL instances of the same issue (default caps at 3)
   max-same-issues: 0
+
+# =============================================================================
+# FORMATTERS: Auto-formatting tools that run alongside linters
+# =============================================================================
+# These check (and can fix) code formatting. They don't report "issues" like
+# linters — they enforce consistent style.
 formatters:
   enable:
+    # gofmt: Standard Go code formatter (indentation, spacing, alignment)
     - gofmt
+    # goimports: Like gofmt, but also organizes import statements into groups:
+    #   1. Standard library  2. Third-party  3. Local project imports
     - goimports
+
   settings:
     goimports:
+      # Local module prefixes — imports matching these are grouped last
+      # This keeps project imports visually separated from external ones
       local-prefixes:
         - ascii-art
+
+  # Same exclusion rules for formatters
   exclusions:
     generated: lax
     paths:

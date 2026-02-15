@@ -21,7 +21,7 @@ import (
 
 const bannerHeight = 8
 
-// RendererASCII converts an input string into ASCII art using the provided banner map.
+// ASCII converts an input string into ASCII art using the provided banner map.
 //
 // The input may contain printable ASCII characters (codes 32–126) and newline
 // characters ('\n'). Newlines are treated as line separators and are not rendered
@@ -46,7 +46,7 @@ const bannerHeight = 8
 // Returns:
 //   - The rendered ASCII-art string.
 //   - An error if input validation or banner validation fails.
-func RendererASCII(input string, banner map[rune][]string) (string, error) {
+func ASCII(input string, banner map[rune][]string) (string, error) {
 	var result strings.Builder
 
 	if err := validateInput(input); err != nil {
@@ -119,6 +119,12 @@ func validateBannerCharacters(ch rune, banner map[rune][]string) ([]string, erro
 // Valid characters are printable ASCII characters (codes 32–126) and newline
 // characters ('\n'). The function returns an error as soon as an invalid character
 // is encountered.
+//
+// Parameters:
+//   - input: The string to validate.
+//
+// Returns:
+//   - An error if invalid characters are found, nil otherwise.
 func validateInput(input string) error {
 	for _, ch := range input {
 		if ch == '\n' {

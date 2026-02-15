@@ -1,6 +1,3 @@
-// Package renderer contains unit tests for the ASCII renderer.
-// These tests verify that RendererASCII correctly converts input strings
-// into their ASCII-art representations using a provided banner.
 package renderer_test
 
 import (
@@ -10,24 +7,18 @@ import (
 	"ascii-art-color/internal/renderer"
 )
 
-// TestEmptyInput verifies that an empty input string
-// produces no output.
 func TestEmptyInput(t *testing.T) {
 	input := ""
 	banner := map[rune][]string{}
-	output, err := renderer.RendererASCII(input, banner)
+	output, err := renderer.ASCII(input, banner)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
-
 	}
 	if input != output {
 		t.Errorf("expected:\n%q\ngot:\n%q", input, output)
-
 	}
 }
 
-// TestSingleCharacter verifies rendering of a single character
-// with a banner height of 8 lines
 func TestSingleCharacter(t *testing.T) {
 	input := "A"
 	expected := `A1
@@ -42,18 +33,15 @@ A8
 	banner := map[rune][]string{
 		'A': {"A1", "A2", "A3", "A4", "A5", "A6", "A7", "A8"},
 	}
-	output, err := renderer.RendererASCII(input, banner)
+	output, err := renderer.ASCII(input, banner)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
 	if expected != output {
 		t.Errorf("expected:\n%q\ngot:\n%q", expected, output)
-
 	}
 }
 
-// TestMultipleCharacters verifies that multiple characters
-// are rendered horizontally on the same ASCII-art rows.
 func TestMultipleCharacters(t *testing.T) {
 	input := "AB"
 	expected := `A1B1
@@ -69,19 +57,15 @@ A8B8
 		'A': {"A1", "A2", "A3", "A4", "A5", "A6", "A7", "A8"},
 		'B': {"B1", "B2", "B3", "B4", "B5", "B6", "B7", "B8"},
 	}
-	output, err := renderer.RendererASCII(input, banner)
+	output, err := renderer.ASCII(input, banner)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
 	if expected != output {
 		t.Errorf("expected:\n%q\ngot:\n%q", expected, output)
-
 	}
-
 }
 
-// TestSpaceBetweenCharacters verifies that spaces between characters
-// are correctly rendered using the space entry in the banner.
 func TestSpaceBetweenCharacters(t *testing.T) {
 	input := "A A"
 	expected := `A1  A1
@@ -97,19 +81,15 @@ A8  A8
 		'A': {"A1", "A2", "A3", "A4", "A5", "A6", "A7", "A8"},
 		' ': {"  ", "  ", "  ", "  ", "  ", "  ", "  ", "  "},
 	}
-	output, err := renderer.RendererASCII(input, banner)
+	output, err := renderer.ASCII(input, banner)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
 	if expected != output {
 		t.Errorf("expected:\n%q\ngot:\n%q", expected, output)
-
 	}
-
 }
 
-// TestNumbersBetweenCharacters verifies that numeric characters
-// are rendered correctly when mixed with letters.
 func TestNumbersBetweenCharacters(t *testing.T) {
 	input := "A1A"
 	expected := `A11A1
@@ -125,18 +105,15 @@ A81A8
 		'A': {"A1", "A2", "A3", "A4", "A5", "A6", "A7", "A8"},
 		'1': {"1", "1", "1", "1", "1", "1", "1", "1"},
 	}
-	output, err := renderer.RendererASCII(input, banner)
+	output, err := renderer.ASCII(input, banner)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
 	if expected != output {
 		t.Errorf("expected:\n%q\ngot:\n%q", expected, output)
-
 	}
 }
 
-// TestSpecialCharacters verifies rendering of special characters
-// that exist in the banner map.
 func TestAllSpecialCharacters(t *testing.T) {
 	specials := `!"#$%&'()*+,-./:;<=>?@[\]^_{|}~`
 
@@ -148,9 +125,9 @@ func TestAllSpecialCharacters(t *testing.T) {
 		}
 	}
 
-	output, err := renderer.RendererASCII(specials, banner)
+	output, err := renderer.ASCII(specials, banner)
 	if err != nil {
-		t.Fatalf("RendererASCII failed for special characters: %v", err)
+		t.Fatalf("ASCII failed for special characters: %v", err)
 	}
 
 	lines := strings.Split(output, "\n")
@@ -165,8 +142,6 @@ func TestAllSpecialCharacters(t *testing.T) {
 	}
 }
 
-// TestNewlineBetweenCharacters verifies that a newline in the input
-// separates the output into multiple ASCII-art blocks.
 func TestNewlineBetweenCharacters(t *testing.T) {
 	input := "A\nB"
 	expected := `A1
@@ -190,19 +165,15 @@ B8
 		'A': {"A1", "A2", "A3", "A4", "A5", "A6", "A7", "A8"},
 		'B': {"B1", "B2", "B3", "B4", "B5", "B6", "B7", "B8"},
 	}
-	output, err := renderer.RendererASCII(input, banner)
+	output, err := renderer.ASCII(input, banner)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
 	if expected != output {
 		t.Errorf("expected:\n%q\ngot:\n%q", expected, output)
-
 	}
-
 }
 
-// TestTrailingNewline verifies that a trailing newline
-// does not produce an extra empty ASCII block.
 func TestTrailingNewline(t *testing.T) {
 	input := "A\n"
 	expected := `A1
@@ -217,7 +188,7 @@ A8
 	banner := map[rune][]string{
 		'A': {"A1", "A2", "A3", "A4", "A5", "A6", "A7", "A8"},
 	}
-	output, err := renderer.RendererASCII(input, banner)
+	output, err := renderer.ASCII(input, banner)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -226,9 +197,6 @@ A8
 	}
 }
 
-// TestConsecutiveNewlines verifies that consecutive newlines
-// create visible separation between ASCII-art blocks,
-// matching the behavior shown in the official examples.
 func TestConsecutiveNewlines(t *testing.T) {
 	input := "A\n\nB"
 	expected := `A1
@@ -253,7 +221,7 @@ B8
 		'A': {"A1", "A2", "A3", "A4", "A5", "A6", "A7", "A8"},
 		'B': {"B1", "B2", "B3", "B4", "B5", "B6", "B7", "B8"},
 	}
-	output, err := renderer.RendererASCII(input, banner)
+	output, err := renderer.ASCII(input, banner)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -262,14 +230,12 @@ B8
 	}
 }
 
-// TestMissingCharacter checks that rendering fails
-// when the input contains a character missing from the banner.
 func TestMissingCharacter(t *testing.T) {
 	input := "AB"
 	banner := map[rune][]string{
 		'A': {"A1", "A2", "A3", "A4", "A5", "A6", "A7", "A8"},
 	}
-	output, err := renderer.RendererASCII(input, banner)
+	output, err := renderer.ASCII(input, banner)
 	if err == nil {
 		t.Error("expected error for missing character 'B', got nil")
 	}
@@ -279,19 +245,15 @@ func TestMissingCharacter(t *testing.T) {
 	}
 	if output != "" {
 		t.Errorf("expected empty output on error, got %q", output)
-
 	}
-
 }
 
-// TestCorruptedBanner checks that rendering fails
-// when a banner character has an invalid number of rows.
 func TestCorruptedBanner(t *testing.T) {
 	input := "A"
 	banner := map[rune][]string{
 		'A': {"A1", "A2", "A3", "A4", "A6", "A7", "A8"},
 	}
-	output, err := renderer.RendererASCII(input, banner)
+	output, err := renderer.ASCII(input, banner)
 	if err == nil {
 		t.Error("expected error for corrupted banner, got nil")
 	}
@@ -300,26 +262,21 @@ func TestCorruptedBanner(t *testing.T) {
 	}
 }
 
-// TestInvalidCharacters checks that rendering fails
-// when the input contains non-printable ASCII characters.
 func TestInvalidCharacters(t *testing.T) {
 	input := "A	B"
 	banner := map[rune][]string{
 		'A': {"A1", "A2", "A3", "A4", "A5", "A6", "A7", "A8"},
 		'B': {"B1", "B2", "B3", "B4", "B5", "B6", "B7", "B8"},
 	}
-	output, err := renderer.RendererASCII(input, banner)
+	output, err := renderer.ASCII(input, banner)
 	if err == nil {
 		t.Fatalf("unexpected error: %v", err)
-
 	}
 	if output != "" {
 		t.Errorf("expected empty output on error, got %q", output)
 	}
 }
 
-// TestCompleteASCIIRange checks that all printable ASCII characters
-// can be rendered when the banner is complete
 func TestCompleteASCIIRange(t *testing.T) {
 	banner := make(map[rune][]string)
 
@@ -334,9 +291,9 @@ func TestCompleteASCIIRange(t *testing.T) {
 		input.WriteRune(ch)
 	}
 
-	output, err := renderer.RendererASCII(input.String(), banner)
+	output, err := renderer.ASCII(input.String(), banner)
 	if err != nil {
-		t.Fatalf("RendererASCII failed for ASCII range: %v", err)
+		t.Fatalf("ASCII failed for ASCII range: %v", err)
 	}
 
 	lines := strings.Split(output, "\n")

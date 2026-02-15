@@ -1,14 +1,14 @@
-// Package main_test provides integration tests for the ascii-art application.
-// These tests verify end-to-end functionality by running the actual program.
 package main
 
 import (
+	"os"
 	"os/exec"
+	"path/filepath"
+	"runtime"
 	"strings"
 	"testing"
 )
 
-// TestMainProgram_Integration verifies end-to-end program execution with various inputs.
 func TestMainProgram_Integration(t *testing.T) {
 	tests := []struct {
 		name        string
@@ -21,9 +21,7 @@ func TestMainProgram_Integration(t *testing.T) {
 			args:        []string{"Hello"},
 			expectError: false,
 			checkOutput: func(output string) bool {
-				// Should have 8 lines
-				lines := strings.Count(output, "\n")
-				return lines == 8
+				return strings.Count(output, "\n") == 8
 			},
 		},
 		{
@@ -31,7 +29,6 @@ func TestMainProgram_Integration(t *testing.T) {
 			args:        []string{""},
 			expectError: false,
 			checkOutput: func(output string) bool {
-				// Should have no output (spec requirement)
 				return output == ""
 			},
 		},
@@ -40,9 +37,7 @@ func TestMainProgram_Integration(t *testing.T) {
 			args:        []string{"Hi", "shadow"},
 			expectError: false,
 			checkOutput: func(output string) bool {
-				// Should have 8 lines
-				lines := strings.Count(output, "\n")
-				return lines == 8
+				return strings.Count(output, "\n") == 8
 			},
 		},
 		{
@@ -50,9 +45,7 @@ func TestMainProgram_Integration(t *testing.T) {
 			args:        []string{"Go", "thinkertoy"},
 			expectError: false,
 			checkOutput: func(output string) bool {
-				// Should have 8 lines
-				lines := strings.Count(output, "\n")
-				return lines == 8
+				return strings.Count(output, "\n") == 8
 			},
 		},
 		{
@@ -60,9 +53,7 @@ func TestMainProgram_Integration(t *testing.T) {
 			args:        []string{"Hello World"},
 			expectError: false,
 			checkOutput: func(output string) bool {
-				// Should have 8 lines and contain space
-				lines := strings.Count(output, "\n")
-				return lines == 8 && len(output) > 0
+				return strings.Count(output, "\n") == 8 && len(output) > 0
 			},
 		},
 		{
@@ -70,9 +61,7 @@ func TestMainProgram_Integration(t *testing.T) {
 			args:        []string{"Hello\nWorld"},
 			expectError: false,
 			checkOutput: func(output string) bool {
-				// Should have 16 lines (8 per text line)
-				lines := strings.Count(output, "\n")
-				return lines == 16
+				return strings.Count(output, "\n") == 16
 			},
 		},
 		{
@@ -97,14 +86,10 @@ func TestMainProgram_Integration(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			// Build command
-			args := append([]string{"run", "main.go"}, tt.args...)
+			args := append([]string{"run", "."}, tt.args...)
 			cmd := exec.Command("go", args...)
-
-			// Run command
 			output, err := cmd.CombinedOutput()
 
-			// Check error expectation
 			if tt.expectError && err == nil {
 				t.Errorf("Expected error but got none")
 			}
@@ -112,7 +97,6 @@ func TestMainProgram_Integration(t *testing.T) {
 				t.Errorf("Unexpected error: %v\nOutput: %s", err, output)
 			}
 
-			// Check output if provided
 			if !tt.expectError && tt.checkOutput != nil {
 				if !tt.checkOutput(string(output)) {
 					t.Errorf("Output check failed.\nOutput:\n%s", output)
@@ -122,14 +106,173 @@ func TestMainProgram_Integration(t *testing.T) {
 	}
 }
 
-// TestMainProgram_RealBannerFiles verifies program works with all banner files.
+func TestRunColorMode(t *testing.T) {
+	tests := []struct {
+		name        string
+		args        []string
+		expectError bool
+		checkOutput func(string) bool
+	}{
+		{
+			name: "full text colored red",
+			args: []string{"--color=red", "hello"},
+			checkOutput: func(output string) bool {
+				return strings.Contains(output, "\033[38;2;255;0;0m") &&
+					strings.Contains(output, "\033[0m") &&
+					strings.Count(output, "\n") == 8
+			},
+		},
+		{
+			name: "substring colored",
+			args: []string{"--color=red", "He", "Hello"},
+			checkOutput: func(output string) bool {
+				return strings.Contains(output, "\033[38;2;255;0;0m") &&
+					strings.Count(output, "\n") == 8
+			},
+		},
+		{
+			name: "full text with shadow banner",
+			args: []string{"--color=blue", "Hi", "shadow"},
+			checkOutput: func(output string) bool {
+				return strings.Contains(output, "\033[38;2;0;0;255m") &&
+					strings.Count(output, "\n") == 8
+			},
+		},
+		{
+			name: "full text with thinkertoy banner",
+			args: []string{"--color=green", "Go", "thinkertoy"},
+			checkOutput: func(output string) bool {
+				return strings.Contains(output, "\033[38;2;0;255;0m") &&
+					strings.Count(output, "\n") == 8
+			},
+		},
+		{
+			name: "substring with banner",
+			args: []string{"--color=green", "Go", "Hello Go", "thinkertoy"},
+			checkOutput: func(output string) bool {
+				return strings.Contains(output, "\033[38;2;0;255;0m") &&
+					strings.Count(output, "\n") == 8
+			},
+		},
+		{
+			name: "hex color format",
+			args: []string{"--color=#ff0000", "hello"},
+			checkOutput: func(output string) bool {
+				return strings.Contains(output, "\033[38;2;255;0;0m") &&
+					strings.Count(output, "\n") == 8
+			},
+		},
+		{
+			name: "rgb color format",
+			args: []string{"--color=rgb(0,255,0)", "hello"},
+			checkOutput: func(output string) bool {
+				return strings.Contains(output, "\033[38;2;0;255;0m") &&
+					strings.Count(output, "\n") == 8
+			},
+		},
+		{
+			name: "multiline text",
+			args: []string{"--color=red", "hello\\nworld"},
+			checkOutput: func(output string) bool {
+				return strings.Contains(output, "\033[38;2;255;0;0m") &&
+					strings.Count(output, "\n") == 16
+			},
+		},
+		{
+			name: "special characters",
+			args: []string{"--color=yellow", "(%&) ??"},
+			checkOutput: func(output string) bool {
+				return strings.Contains(output, "\033[38;2;255;255;0m") &&
+					strings.Count(output, "\n") == 8
+			},
+		},
+		{
+			name: "substring not found in text",
+			args: []string{"--color=red", "xyz", "Hello"},
+			checkOutput: func(output string) bool {
+				return !strings.Contains(output, "\033[38;2;") &&
+					strings.Count(output, "\n") == 8
+			},
+		},
+		{
+			name: "single character text",
+			args: []string{"--color=red", "A"},
+			checkOutput: func(output string) bool {
+				return strings.Contains(output, "\033[38;2;255;0;0m") &&
+					strings.Count(output, "\n") == 8
+			},
+		},
+		{
+			name: "text with spaces",
+			args: []string{"--color=red", "Hello World"},
+			checkOutput: func(output string) bool {
+				return strings.Contains(output, "\033[38;2;255;0;0m") &&
+					strings.Count(output, "\n") == 8
+			},
+		},
+		{
+			name: "single character substring",
+			args: []string{"--color=blue", "B", "RGB()"},
+			checkOutput: func(output string) bool {
+				return strings.Contains(output, "\033[38;2;0;0;255m") &&
+					strings.Count(output, "\n") == 8
+			},
+		},
+		{
+			name:        "invalid color name",
+			args:        []string{"--color=notacolor", "hello"},
+			expectError: true,
+		},
+		{
+			name:        "wrong flag format missing equals",
+			args:        []string{"--color", "red", "hello"},
+			expectError: true,
+		},
+		{
+			name:        "empty color value",
+			args:        []string{"--color=", "hello"},
+			expectError: true,
+		},
+		{
+			name:        "invalid hex format",
+			args:        []string{"--color=#zzzzzz", "hello"},
+			expectError: true,
+		},
+		{
+			name:        "invalid rgb format",
+			args:        []string{"--color=rgb(999,0,0)", "hello"},
+			expectError: true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			args := append([]string{"run", "."}, tt.args...)
+			cmd := exec.Command("go", args...)
+			output, err := cmd.CombinedOutput()
+
+			if tt.expectError {
+				if err == nil {
+					t.Errorf("expected error but got none\nOutput: %s", output)
+				}
+				return
+			}
+			if err != nil {
+				t.Fatalf("unexpected error: %v\nOutput: %s", err, output)
+			}
+			if tt.checkOutput != nil && !tt.checkOutput(string(output)) {
+				t.Errorf("output check failed\nOutput:\n%s", output)
+			}
+		})
+	}
+}
+
 func TestMainProgram_RealBannerFiles(t *testing.T) {
-	// This test requires banner files to exist
 	banners := []string{"standard", "shadow", "thinkertoy"}
 
 	for _, banner := range banners {
 		t.Run("Banner_"+banner, func(t *testing.T) {
-			cmd := exec.Command("go", "run", "main.go", "ABC", banner)
+			cmd := exec.Command("go", "run", ".", "ABC", banner)
 			output, err := cmd.CombinedOutput()
 
 			if err != nil {
@@ -137,12 +280,10 @@ func TestMainProgram_RealBannerFiles(t *testing.T) {
 					banner, err, output)
 			}
 
-			// Verify output has content
 			if len(output) == 0 {
 				t.Errorf("Expected output for banner %s, got empty", banner)
 			}
 
-			// Verify correct number of lines
 			lines := strings.Count(string(output), "\n")
 			if lines != 8 {
 				t.Errorf("Expected 8 lines for banner %s, got %d", banner, lines)
@@ -151,7 +292,6 @@ func TestMainProgram_RealBannerFiles(t *testing.T) {
 	}
 }
 
-// TestMainProgram_ErrorHandling verifies program handles error cases correctly.
 func TestMainProgram_ErrorHandling(t *testing.T) {
 	errorTests := []struct {
 		name     string
@@ -172,7 +312,7 @@ func TestMainProgram_ErrorHandling(t *testing.T) {
 
 	for _, tt := range errorTests {
 		t.Run(tt.name, func(t *testing.T) {
-			cmd := exec.Command("go", append([]string{"run", "main.go"}, tt.args...)...)
+			cmd := exec.Command("go", append([]string{"run", "."}, tt.args...)...)
 			output, err := cmd.CombinedOutput()
 
 			if err == nil {
@@ -182,6 +322,119 @@ func TestMainProgram_ErrorHandling(t *testing.T) {
 			if !strings.Contains(string(output), tt.errorMsg) {
 				t.Errorf("Expected error message containing %q, got: %s",
 					tt.errorMsg, output)
+			}
+		})
+	}
+}
+
+func TestColorFlagFormatErrors_ShowColorUsage(t *testing.T) {
+	tests := []struct {
+		name string
+		args []string
+	}{
+		{
+			name: "missing equals in color flag",
+			args: []string{"--color", "red", "banana"},
+		},
+		{
+			name: "colon notation in color flag",
+			args: []string{"--color:red", "hello"},
+		},
+	}
+
+	usageLine := "Usage: go run . [OPTION] [STRING]"
+	exampleLine := "EX: go run . --color=<color> <substring to be colored> \"something\""
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			cmd := exec.Command("go", append([]string{"run", "."}, tt.args...)...)
+			output, err := cmd.CombinedOutput()
+			if err == nil {
+				t.Fatalf("expected non-zero exit status, got nil")
+			}
+
+			out := string(output)
+			if !strings.Contains(out, usageLine) {
+				t.Fatalf("expected usage line %q in output, got: %s", usageLine, out)
+			}
+			if !strings.Contains(out, exampleLine) {
+				t.Fatalf("expected example line %q in output, got: %s", exampleLine, out)
+			}
+		})
+	}
+}
+
+func TestBuiltBinary_FromRepoRoot(t *testing.T) {
+	binName := "ascii-art-test"
+	if runtime.GOOS == "windows" {
+		binName += ".exe"
+	}
+
+	binPath := filepath.Join("..", "..", "bin", binName)
+
+	buildCmd := exec.Command("go", "build", "-o", binPath, ".")
+	if err := buildCmd.Run(); err != nil {
+		t.Fatalf("failed to build binary: %v", err)
+	}
+	defer os.Remove(binPath)
+
+	tests := []struct {
+		name        string
+		args        []string
+		expectError bool
+		checkOutput func(string) bool
+	}{
+		{
+			name:        "simple text with standard banner",
+			args:        []string{"Hi", "standard"},
+			expectError: false,
+			checkOutput: func(output string) bool {
+				return strings.Count(output, "\n") == 8 && len(output) > 0
+			},
+		},
+		{
+			name:        "with shadow banner",
+			args:        []string{"Test", "shadow"},
+			expectError: false,
+			checkOutput: func(output string) bool {
+				return strings.Count(output, "\n") == 8 && len(output) > 0
+			},
+		},
+		{
+			name:        "with thinkertoy banner",
+			args:        []string{"Go", "thinkertoy"},
+			expectError: false,
+			checkOutput: func(output string) bool {
+				return strings.Count(output, "\n") == 8 && len(output) > 0
+			},
+		},
+		{
+			name:        "invalid banner shows error",
+			args:        []string{"Hi", "notexist"},
+			expectError: true,
+			checkOutput: nil,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			cmd := exec.Command(binPath, tt.args...)
+			output, err := cmd.CombinedOutput()
+
+			if tt.expectError {
+				if err == nil {
+					t.Errorf("expected error but got none\nOutput: %s", output)
+				}
+				return
+			}
+
+			if err != nil {
+				t.Errorf("unexpected error: %v\nOutput: %s", err, output)
+				return
+			}
+
+			if tt.checkOutput != nil && !tt.checkOutput(string(output)) {
+				t.Errorf("output check failed.\nOutput:\n%s", output)
 			}
 		})
 	}

@@ -1,0 +1,81 @@
+# Release Workflow — runs when a version tag is pushed (e.g. v1.1.0).
+# Builds cross-platform binaries and creates a GitHub Release with
+# all binaries attached as downloadable assets.
+name: Release
+
+# TRIGGER: Only runs when a tag starting with "v" is pushed.
+# Examples: v1.0.0, v1.1.0, v2.0.0-rc1
+# This does NOT run on regular pushes or PRs.
+on:
+  push:
+    tags:
+      - 'v*'
+
+# PERMISSIONS: The workflow needs write access to create releases
+# and upload binary assets to the GitHub Release page.
+permissions:
+  contents: write
+
+jobs:
+
+  # ─── RELEASE JOB ────────────────────────────────────────────────────────
+  # Builds binaries for 5 platform/architecture combinations and
+  # creates a GitHub Release with all of them attached.
+  release:
+    name: Build and Release
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Clone the repository (with the tagged commit).
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Step 2: Install Go for compilation.
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.22'
+
+      # Step 3: Build binaries for all target platforms.
+      # Go supports cross-compilation natively: setting GOOS and GOARCH
+      # tells the compiler to produce a binary for that platform,
+      # even though we're running on Ubuntu Linux.
+      #
+      # Targets (same as Makefile build-all):
+      #   - Linux:   amd64 (Intel/AMD 64-bit), arm64 (Apple Silicon, Raspberry Pi)
+      #   - macOS:   amd64 (older Macs), arm64 (Apple Silicon M1/M2/M3)
+      #   - Windows: amd64 (standard PCs)
+      - name: Build Linux amd64
+        run: GOOS=linux GOARCH=amd64 go build -o bin/ascii-art-linux-amd64 ./cmd/ascii-art
+
+      - name: Build Linux arm64
+        run: GOOS=linux GOARCH=arm64 go build -o bin/ascii-art-linux-arm64 ./cmd/ascii-art
+
+      - name: Build macOS amd64
+        run: GOOS=darwin GOARCH=amd64 go build -o bin/ascii-art-darwin-amd64 ./cmd/ascii-art
+
+      - name: Build macOS arm64
+        run: GOOS=darwin GOARCH=arm64 go build -o bin/ascii-art-darwin-arm64 ./cmd/ascii-art
+
+      - name: Build Windows amd64
+        run: GOOS=windows GOARCH=amd64 go build -o bin/ascii-art-windows-amd64.exe ./cmd/ascii-art
+
+      # Step 4: Create a GitHub Release and upload the binaries.
+      # softprops/action-gh-release is a widely-used community action that:
+      #   - Creates a Release page on GitHub using the tag name as the title
+      #   - Attaches the listed files as downloadable assets
+      #   - Auto-generates release notes from commit messages
+      #
+      # "files:" lists the binary paths to upload (one per line).
+      # "generate_release_notes: true" tells GitHub to auto-create
+      # a changelog from PR titles and commit messages since the last tag.
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          generate_release_notes: true
+          files: |
+            bin/ascii-art-linux-amd64
+            bin/ascii-art-linux-arm64
+            bin/ascii-art-darwin-amd64
+            bin/ascii-art-darwin-arm64
+            bin/ascii-art-windows-amd64.exe
