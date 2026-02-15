@@ -84,6 +84,14 @@ func Parse(colorSpec string) (RGB, error) {
 	return RGB{}, fmt.Errorf("unknown color format %q: %w", colorSpec, ErrInvalidFormat)
 }
 
+// parseHex parses a hex color string in format #RRGGBB to RGB.
+//
+// Parameters:
+//   - hex: Color string in format #RRGGBB (e.g., "#ff0000").
+//
+// Returns:
+//   - RGB value representing the parsed color.
+//   - An error if the hex format is invalid or values are out of range.
 func parseHex(hex string) (RGB, error) {
 	r, err := strconv.ParseUint(hex[1:3], hexBase, uint8Bits)
 	if err != nil {
@@ -102,6 +110,14 @@ func parseHex(hex string) (RGB, error) {
 	return RGB{uint8(r), uint8(g), uint8(b)}, nil
 }
 
+// parseRGB parses an RGB color string in format rgb(R,G,B) to RGB.
+//
+// Parameters:
+//   - rgbStr: Color string in format rgb(R,G,B) (e.g., "rgb(255,0,0)").
+//
+// Returns:
+//   - RGB value representing the parsed color.
+//   - An error if the format is invalid or component values are out of range (0-255).
 func parseRGB(rgbStr string) (RGB, error) {
 	if !strings.HasSuffix(rgbStr, ")") {
 		return RGB{}, fmt.Errorf("missing closing parenthesis: %w", ErrInvalidFormat)

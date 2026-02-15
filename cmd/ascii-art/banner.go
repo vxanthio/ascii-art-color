@@ -42,6 +42,12 @@ func GetBannerPath(banner string) (string, error) {
 }
 
 // isValidBanner checks whether a string is a recognized banner name.
+//
+// Parameters:
+//   - name: The banner name to validate.
+//
+// Returns:
+//   - true if the banner name is valid (standard, shadow, or thinkertoy), false otherwise.
 func isValidBanner(name string) bool {
 	_, exists := bannerPaths[name]
 	return exists

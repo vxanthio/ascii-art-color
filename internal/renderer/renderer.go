@@ -119,6 +119,12 @@ func validateBannerCharacters(ch rune, banner map[rune][]string) ([]string, erro
 // Valid characters are printable ASCII characters (codes 32–126) and newline
 // characters ('\n'). The function returns an error as soon as an invalid character
 // is encountered.
+//
+// Parameters:
+//   - input: The string to validate.
+//
+// Returns:
+//   - An error if invalid characters are found, nil otherwise.
 func validateInput(input string) error {
 	for _, ch := range input {
 		if ch == '\n' {

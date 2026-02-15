@@ -55,6 +55,15 @@ func ApplyColor(
 // start and end, based on character boundaries defined by charWidths.
 // This function assumes that positions corresponds to indexes in the
 // original text, not byte offsets in the ASCII art.
+//
+// Parameters:
+//   - line: The ASCII art line to colorize.
+//   - positions: Boolean slice marking which characters should be colored.
+//   - charWidths: Column widths for each character in the original text.
+//   - colorCode: ANSI escape sequence for the desired color.
+//
+// Returns:
+//   - The colorized line with ANSI color codes inserted.
 func colorLine(
 	line string,
 	positions []bool,
@@ -103,6 +112,13 @@ func colorLine(
 // Each index set to true represents a character that should be colorized.
 // If substring is empty, all positions in text are marked true, indicating
 // that the entire text should be colored.
+//
+// Parameters:
+//   - text: The text to search for substring matches.
+//   - substring: The substring to find; if empty, all positions are marked true.
+//
+// Returns:
+//   - A boolean slice with the same length as text, with true for matched positions.
 func findPositions(text string, substring string) []bool {
 	positions := make([]bool, len(text))
 

@@ -13,15 +13,14 @@ import (
 	"ascii-art-color/internal/renderer"
 )
 
-// runColorMode handles the full color mode pipeline: validation, parsing, rendering,
-// and colorizing. It prints the colored ASCII art to stdout and exits with the
-// appropriate exit code on error.
+// runColorMode handles execution when the --color flag is detected.
 //
-// For multiline text (containing \n), each line is rendered and colorized separately
-// so that character widths and substring positions are computed per line.
+// The function validates color mode arguments, parses the color specification,
+// loads the banner, and renders ASCII art with ANSI color codes applied.
+// It exits with appropriate error codes if validation or rendering fails.
 //
 // Parameters:
-//   - args: Command-line arguments including program name.
+//   - args: Command-line arguments including os.Args[0].
 func runColorMode(args []string) {
 	if err := flagparser.ParseArgs(args); err != nil {
 		fmt.Fprintln(os.Stderr, err)
@@ -79,7 +78,13 @@ func runColorMode(args []string) {
 	}
 }
 
-// hasColorFlag checks whether the first user argument attempts to use --color.
+// hasColorFlag checks whether the first user argument uses the --color flag.
+//
+// Parameters:
+//   - args: Command-line arguments slice including os.Args[0].
+//
+// Returns:
+//   - true if args[1] starts with "--color", false otherwise.
 func hasColorFlag(args []string) bool {
 	return len(args) > 1 && strings.HasPrefix(args[1], "--color")
 }

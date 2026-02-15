@@ -39,6 +39,11 @@ const (
 	defaultBanner = "standard"
 )
 
+// main is the entry point of the ascii-art application.
+//
+// It determines whether to run in normal mode or color mode based on
+// the presence of the --color flag, then orchestrates the appropriate
+// packages to render ASCII art with optional ANSI color codes.
 func main() {
 	if hasColorFlag(os.Args) {
 		runColorMode(os.Args)
