@@ -3,8 +3,7 @@
 //
 // The renderer processes printable ASCII characters (range 32–126) and renders each
 // character as an ASCII-art block with a fixed height (bannerHeight).
-// Newline characters ('\n') are treated as line separators and preserved as separate
-// ASCII-art blocks in the output.
+// Newline characters ('\n') are treated as line separators and produce empty output lines.
 //
 // Responsibilities of this package:
 //   - Validate input characters
