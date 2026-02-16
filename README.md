@@ -65,6 +65,8 @@ cd cmd/ascii-art && go run . --color=<color> <substring> "text" [banner]
 - **Hex**: `#RRGGBB` (e.g. `#ff0000`)
 - **RGB**: `rgb(R,G,B)` (e.g. `rgb(255,0,0)`)
 
+> **Note**: RGB format requires quoting or escaping in bash/zsh due to parentheses. Use single quotes (`'rgb(...)'`), double quotes (`"rgb(...)"`), or escape parentheses (`rgb\(...\)`).
+
 ### Examples
 
 **Standard banner (default):**
@@ -102,9 +104,19 @@ cd cmd/ascii-art && go run . --color=blue B "RGB()"
 cd cmd/ascii-art && go run . --color=#ff0000 "Hello"
 ```
 
-**RGB color format:**
+**RGB color format (with escaped parentheses):**
 ```bash
 cd cmd/ascii-art && go run . --color=rgb\(255,0,0\) "Hello"
+```
+
+**RGB color format (with single quotes):**
+```bash
+cd cmd/ascii-art && go run . --color='rgb(255,0,0)' "Hello"
+```
+
+**RGB color format (with double quotes):**
+```bash
+cd cmd/ascii-art && go run . --color="rgb(255,0,0)" "Hello"
 ```
 
 **Newline support:**
