@@ -158,7 +158,7 @@ func parseRGB(rgbStr string) (RGB, error) {
 
 // ANSI returns the 24-bit ANSI escape sequence for the given color.
 //
-// The returned string has the format \x1b[38;2;<r>;<g>;<b>m and can be
+// The returned string has the format \033[38;2;<r>;<g>;<b>m and can be
 // written directly to a terminal that supports 24-bit color.
 //
 // Parameters:
